@@ -1,0 +1,58 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>我的小站</title>
+  <style>
+    :root {
+      --bg: radial-gradient(circle at 20% 20%, #1d2b64, #090a0f 55%);
+      --card: rgba(255,255,255,0.08);
+      --text: #f6f7fb;
+      --accent: #7dd3fc;
+      --muted: #9ca3af;
+    }
+    body {
+      margin: 0; min-height: 100vh; color: var(--text);
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: var(--bg); display: grid; place-items: center; padding: 32px;
+    }
+    .card {
+      width: min(960px, 92vw); padding: 32px 36px;
+      background: var(--card); border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px; backdrop-filter: blur(8px);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.35);
+    }
+    h1 { margin: 0 0 12px; font-size: 28px; letter-spacing: 0.5px; }
+    p { margin: 0 0 18px; color: var(--muted); line-height: 1.6; }
+    .gallery { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .tile { position: relative; overflow: hidden; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); }
+    .tile img, .tile video { width: 100%; display: block; }
+    .chip { display: inline-block; padding: 6px 12px; border-radius: 999px;
+            background: rgba(125,211,252,0.18); color: var(--accent);
+            border: 1px solid rgba(125,211,252,0.4); font-size: 13px; }
+    footer { margin-top: 18px; font-size: 13px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <span class="chip">Hello · 欢迎</span>
+    <h1>我的静态小站</h1>
+    <p>这里放文字、图片、视频链接都可以。把文件上传到仓库后，GitHub Pages 会自动展示。</p>
+
+    <div class="gallery">
+      <div class="tile">
+        <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80" alt="山景示例">
+      </div>
+      <div class="tile">
+        <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=900&q=80" alt="人像示例">
+      </div>
+      <div class="tile">
+        <video src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" controls></video>
+      </div>
+    </div>
+
+    <footer>© 2026 Your Name · Edit index.html 自定义内容</footer>
+  </div>
+</body>
+</html>
