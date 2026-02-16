@@ -1,24 +1,31 @@
-const treeEl = document.getElementById("tree");
-const contentEl = document.getElementById("content");
-const titleEl = document.getElementById("title");
-const summaryEl = document.getElementById("summary");
-const breadcrumbEl = document.getElementById("breadcrumb");
-let nodes = new Map(), parent = new Map();
+const avatarEl = document.getElementById("avatar");
+const rootStack = document.getElementById("root-stack");
+const childStack = document.getElementById("child-stack");
+const detailEl = document.getElementById("detail");
+const heroTitle = document.getElementById("hero-title");
+const heroSummary = document.getElementById("hero-summary");
+
+let nodes = new Map();
+let parent = new Map();
+let currentRoot = null;
+
+if (avatarEl) {
+  avatarEl.onerror = () => { avatarEl.src = "assets/img/avatar-fallback.svg"; };
+}
 
 fetch("assets/data/manifest.json", { cache: "no-cache" })
   .then(r => r.json())
   .then(tree => {
     index(tree);
-    const kids = tree.children || [];
-    if (!kids.length) {
-      treeEl.textContent = "暂无内容，请在 content/ 下新增文件夹或 Markdown 再运行构建。";
-      renderEmpty();
+    const roots = tree.children || [];
+    if (!roots.length) {
+      renderEmpty("暂无内容", "在 content/ 中新增文件夹或 Markdown，然后运行 node scripts/build-manifest.js。");
       return;
     }
-    treeEl.appendChild(renderTree(kids));
-    select(kids[0].id);
+    renderRootStack(roots);
+    selectRoot(roots[0].id);
   })
-  .catch(err => { contentEl.textContent = "加载清单失败: " + err; });
+  .catch(err => renderEmpty("加载失败", String(err)));
 
 function index(node, p = null) {
   nodes.set(node.id, node);
@@ -26,65 +33,101 @@ function index(node, p = null) {
   (node.children || []).forEach(c => index(c, node));
 }
 
-function renderTree(list) {
-  const ul = document.createElement("ul");
-  ul.className = "tree";
-  list.forEach(n => {
-    const li = document.createElement("li");
-    const btn = document.createElement("button");
-    btn.className = "tree-btn";
-    btn.textContent = n.title;
-    btn.dataset.id = n.id;
-    li.appendChild(btn);
-    if (n.type === "folder" && n.children?.length) li.appendChild(renderTree(n.children));
-    ul.appendChild(li);
+function renderRootStack(list) {
+  rootStack.innerHTML = "";
+  list.forEach((n, i) => {
+    const card = makeCard(n, "folder");
+    card.style.transform = `translateX(${i * -8}px)`;
+    card.onclick = () => selectRoot(n.id);
+    rootStack.appendChild(card);
   });
-  ul.addEventListener("click", e => {
-    const b = e.target.closest(".tree-btn");
-    if (b) select(b.dataset.id);
-  });
-  return ul;
 }
 
-function select(id) {
+function selectRoot(id) {
   const n = nodes.get(id);
   if (!n) return;
-  titleEl.textContent = n.title;
-  summaryEl.textContent = n.summary || (n.type === "folder" ? "文件夹" : "");
-  breadcrumbEl.textContent = breadcrumb(n).join(" / ");
-  renderBlocks(n);
-  document.querySelectorAll(".tree-btn").forEach(b => b.classList.toggle("active", b.dataset.id === id));
+  currentRoot = n;
+  heroTitle.textContent = n.title;
+  heroSummary.textContent = n.summary || "左右切换一级目录，点击下方卡片查看详情。";
+  renderChildStack(n.children || []);
+  highlight(rootStack, id);
+  renderDetail(n);
 }
 
-function breadcrumb(n) {
-  const path = [];
-  while (n) { path.unshift(n.title); n = parent.get(n.id) ? nodes.get(parent.get(n.id)) : null; }
-  return path;
-}
-
-function renderBlocks(n) {
-  contentEl.innerHTML = "";
-  if (n.type === "folder") {
-    const list = document.createElement("ul");
-    list.className = "child-list";
-    (n.children || []).forEach(c => {
-      const li = document.createElement("li");
-      li.textContent = `${c.type === "folder" ? "📁" : "📝"} ${c.title}`;
-      li.onclick = () => select(c.id);
-      list.appendChild(li);
-    });
-    contentEl.appendChild(list);
+function renderChildStack(list) {
+  childStack.innerHTML = "";
+  if (!list.length) {
+    childStack.innerHTML = `<div class="muted">该目录下暂无内容。</div>`;
+    detailEl.innerHTML = "";
     return;
   }
-  const wrap = document.createElement("article");
-  wrap.className = "block";
-  wrap.innerHTML = n.html || "<p class='muted'>空文档</p>";
-  contentEl.appendChild(wrap);
+  list.forEach((n, i) => {
+    const type = n.type === "folder" ? "folder" : "note";
+    const card = makeCard(n, type);
+    card.style.transform = `translateX(${i * -6}px)`;
+    card.onclick = () => renderDetail(n);
+    childStack.appendChild(card);
+  });
 }
 
-function renderEmpty() {
-  breadcrumbEl.textContent = "";
-  titleEl.textContent = "暂无内容";
-  summaryEl.textContent = "在 content/ 中添加 Markdown 或文件夹，然后重新运行 manifest 构建。";
-  contentEl.innerHTML = "<p class='muted'>还没有任何文件。</p>";
+function makeCard(node, type) {
+  const card = document.createElement("div");
+  card.className = `card ${type}`;
+  card.dataset.id = node.id;
+  const h = document.createElement("h3");
+  h.textContent = node.title;
+  const p = document.createElement("p");
+  p.textContent = node.summary || (node.type === "folder" ? "文件夹" : "Markdown 文档");
+  card.append(h, p);
+  return card;
+}
+
+function renderDetail(node) {
+  highlight(childStack, node.id);
+  detailEl.innerHTML = "";
+  const title = document.createElement("h2");
+  title.textContent = node.title;
+  const summary = document.createElement("span");
+  summary.className = "muted";
+  summary.textContent = node.summary || (node.type === "folder" ? "文件夹" : "笔记");
+  detailEl.append(title, summary);
+
+  if (node.type === "folder") {
+    const children = node.children || [];
+    if (!children.length) {
+      const empty = document.createElement("p");
+      empty.className = "muted";
+      empty.textContent = "暂无子内容。";
+      detailEl.append(empty);
+      return;
+    }
+    const rail = document.createElement("div");
+    rail.className = "stack rail";
+    children.forEach((c, i) => {
+      const card = makeCard(c, c.type === "folder" ? "folder" : "note");
+      card.style.transform = `translateX(${i * -4}px)`;
+      card.onclick = () => renderDetail(c);
+      rail.appendChild(card);
+    });
+    detailEl.append(rail);
+  } else {
+    const article = document.createElement("article");
+    article.innerHTML = node.html || "<p class='muted'>空文档</p>";
+    detailEl.append(article);
+  }
+}
+
+function highlight(container, id) {
+  container.querySelectorAll(".card").forEach(card => {
+    const active = card.dataset.id === id;
+    card.style.borderColor = active ? "rgba(113,196,255,0.6)" : "var(--border)";
+  });
+}
+
+function renderEmpty(title, desc) {
+  rootStack.innerHTML = "";
+  childStack.innerHTML = "";
+  heroTitle.textContent = title;
+  heroSummary.textContent = desc;
+  detailEl.innerHTML = `<p class="muted">${desc}</p>`;
 }
