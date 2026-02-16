@@ -3,16 +3,56 @@
   "title": "内容库",
   "children": [
     {
-      "id": "旧日梦预",
+      "id": "一级1",
       "type": "folder",
-      "title": "旧日梦预",
+      "title": "一级1",
       "children": [
         {
-          "id": "旧日梦预/未命名.md",
+          "id": "一级1/二级1",
+          "type": "folder",
+          "title": "二级1",
+          "children": [
+            {
+              "id": "一级1/二级1/二级文件.md",
+              "type": "note",
+              "title": "二级文件.md",
+              "summary": "",
+              "html": "<p>![[白旬.jpg]]</p>\n"
+            }
+          ]
+        },
+        {
+          "id": "一级1/一级文件.md",
           "type": "note",
-          "title": "未命名.md",
+          "title": "一级文件.md",
           "summary": "",
-          "html": "<p>![[白旬.jpg]]</p>\n"
+          "html": "<p>1</p>\n"
+        }
+      ]
+    },
+    {
+      "id": "一级2",
+      "type": "folder",
+      "title": "一级2",
+      "children": [
+        {
+          "id": "一级2/二级2",
+          "type": "folder",
+          "title": "二级2",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "一级3",
+      "type": "folder",
+      "title": "一级3",
+      "children": [
+        {
+          "id": "一级3/二级3",
+          "type": "folder",
+          "title": "二级3",
+          "children": []
         }
       ]
     }
