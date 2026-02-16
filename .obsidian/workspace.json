@@ -178,6 +178,7 @@
   },
   "active": "fb0701b539b78951",
   "lastOpenFiles": [
+    "content/？",
     "assets/data/manifest.json",
     "assets/data",
     "package-lock.json",
@@ -192,7 +193,6 @@
     "node_modules/js-yaml/package.json",
     "node_modules/js-yaml/lib/js-yaml/type/js/undefined.js",
     "node_modules/js-yaml/lib/js-yaml/type.js",
-    "node_modules/js-yaml/lib/js-yaml/type/timestamp.js",
     "node_modules/kind-of/README.md",
     "node_modules/gray-matter/CHANGELOG.md",
     "node_modules/argparse/CHANGELOG.md",

@@ -3,34 +3,9 @@
   "title": "内容库",
   "children": [
     {
-      "id": "code",
+      "id": "？",
       "type": "folder",
-      "title": "code",
-      "children": []
-    },
-    {
-      "id": "paintings",
-      "type": "folder",
-      "title": "paintings",
-      "children": [
-        {
-          "id": "paintings/landscapes",
-          "type": "folder",
-          "title": "landscapes",
-          "children": []
-        },
-        {
-          "id": "paintings/portraits",
-          "type": "folder",
-          "title": "portraits",
-          "children": []
-        }
-      ]
-    },
-    {
-      "id": "writing",
-      "type": "folder",
-      "title": "writing",
+      "title": "？",
       "children": []
     }
   ]
