@@ -3,45 +3,26 @@
 <head>
   <meta charset=utf-8 />
   <meta name=viewport content=width=device-width initial-scale=1 />
-  <title>作品集 · 根目录</title>
+  <title>模块化作品库</title>
   <link rel=stylesheet href=assets/css/style.css />
 </head>
 <body>
   <div class=layout>
     <aside class=sidebar>
-      <div class=logo>📂 我的作品集</div>
-      <ul class=tree>
-        <li><a class=label folder href=content/paintings/index.html>画作</a></li>
-        <li><a class=label folder href=content/code/index.html>编程作品</a></li>
-        <li><a class=label folder href=content/writing/index.html>文字 / 笔记</a></li>
-      </ul>
-      <div class=footer>像 Obsidian 一样：目录层层嵌套，页面间用链接跳转。</div>
+      <div class=logo>🗂️ 自由结构</div>
+      <p class=muted>像 Obsidian 一样的层级树，点击节点加载内容。</p>
+      <div id=tree></div>
+      <div class=footer>可随意增删节点 / 嵌套，文本块支持图文视频。</div>
     </aside>
 
     <main class=main>
+      <div class=breadcrumb id=breadcrumb></div>
       <div class=header>
-        <div class=chip>根 · Overview</div>
-        <h1>欢迎来到我的作品集</h1>
-        <p>入口页。按类别浏览：画作系列、编程产品、文字记录。点击卡片进入对应文件夹。</p>
+        <div class=chip>Workspace</div>
+        <h1 id=title>选择左侧任意节点</h1>
+        <p id=summary class=muted>每个节点就是一个文件夹或笔记，都能混排文字、图片、视频。</p>
       </div>
-
-      <section class=section-grid>
-        <a class=card href=content/paintings/index.html>
-          <div class=chip>画作</div>
-          <h3>Painting Library</h3>
-          <p class=desc>按主题（风景 / 人像 / 速写等）分类的画作墙，可继续下钻到更细子文件夹。</p>
-        </a>
-        <a class=card href=content/code/index.html>
-          <div class=chip>编程</div>
-          <h3>Code & Product Demos</h3>
-          <p class=desc>包含视频、截图、仓库链接的项目展示区。</p>
-        </a>
-        <a class=card href=content/writing/index.html>
-          <div class=chip>文字</div>
-          <h3>Writing / Notes</h3>
-          <p class=desc>纯文本或长文记录，可作为项目背后的故事或创作笔记。</p>
-        </a>
-      </section>
+      <div id=content></div>
     </main>
   </div>
   <script src=assets/js/main.js></script>
