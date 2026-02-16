@@ -4,34 +4,32 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>模块化作品库</title>
-  <link rel="stylesheet" href="assets/css/style.css?v=4" />
+  <link rel="stylesheet" href="assets/css/style.css?v=5" />
 </head>
 <body>
   <div class="page">
-    <header class="hero">
-      <div class="avatar-shell">
+    <header class="top">
+      <div class="avatar-box">
         <img id="avatar" src="avatar/profile.jpg" alt="avatar" />
       </div>
-      <div class="hero-meta">
-        <p class="eyebrow">Workspace</p>
-        <h1 id="hero-title">作品集</h1>
-        <p id="hero-summary" class="muted">左侧堆栈选择一个一级目录，悬停放大，点击展开内容。</p>
+      <div class="intro">
+        <p class="eyebrow">Portfolio</p>
+        <h1 id="intro-title">作品集</h1>
+        <p id="intro-summary">左侧头像，右侧简介；下方卡片堆叠，左右滑动选择一级目录。</p>
       </div>
     </header>
 
-    <section class="stack-panel">
-      <div class="stack-title">一级目录</div>
+    <section class="stack-area">
+      <div class="stack-header">
+        <span>卡片堆叠 · 一级目录</span>
+        <span class="hint">左右滑动 / 滚动</span>
+      </div>
       <div class="stack rail" id="root-stack"></div>
-    </section>
-
-    <section class="stack-panel">
-      <div class="stack-title" id="sub-stack-title">子内容</div>
-      <div class="stack rail" id="child-stack"></div>
     </section>
 
     <section class="detail" id="detail"></section>
   </div>
 
-  <script src="assets/js/main.js?v=4"></script>
+  <script src="assets/js/main.js?v=5"></script>
 </body>
 </html>

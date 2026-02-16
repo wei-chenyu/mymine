@@ -1,9 +1,8 @@
 const avatarEl = document.getElementById("avatar");
+const introTitle = document.getElementById("intro-title");
+const introSummary = document.getElementById("intro-summary");
 const rootStack = document.getElementById("root-stack");
-const childStack = document.getElementById("child-stack");
 const detailEl = document.getElementById("detail");
-const heroTitle = document.getElementById("hero-title");
-const heroSummary = document.getElementById("hero-summary");
 
 let nodes = new Map();
 let parent = new Map();
@@ -18,10 +17,7 @@ fetch("assets/data/manifest.json", { cache: "no-cache" })
   .then(tree => {
     index(tree);
     const roots = tree.children || [];
-    if (!roots.length) {
-      renderEmpty("暂无内容", "在 content/ 中新增文件夹或 Markdown，然后运行 node scripts/build-manifest.js。");
-      return;
-    }
+    if (!roots.length) return renderEmpty("暂无内容", "在 content/ 中新增文件夹或 Markdown，然后运行 node scripts/build-manifest.js。");
     renderRootStack(roots);
     selectRoot(roots[0].id);
   })
@@ -36,8 +32,8 @@ function index(node, p = null) {
 function renderRootStack(list) {
   rootStack.innerHTML = "";
   list.forEach((n, i) => {
-    const card = makeCard(n, "folder");
-    card.style.transform = `translateX(${i * -8}px)`;
+    const card = makeCard(n, n.type === "folder" ? "folder" : "note");
+    card.style.transform = `translateX(${i * -10}px)`;
     card.onclick = () => selectRoot(n.id);
     rootStack.appendChild(card);
   });
@@ -47,43 +43,13 @@ function selectRoot(id) {
   const n = nodes.get(id);
   if (!n) return;
   currentRoot = n;
-  heroTitle.textContent = n.title;
-  heroSummary.textContent = n.summary || "左右切换一级目录，点击下方卡片查看详情。";
-  renderChildStack(n.children || []);
   highlight(rootStack, id);
+  introTitle.textContent = n.title;
+  introSummary.textContent = n.summary || "左右滑动卡片，点击查看详情与子项。";
   renderDetail(n);
 }
 
-function renderChildStack(list) {
-  childStack.innerHTML = "";
-  if (!list.length) {
-    childStack.innerHTML = `<div class="muted">该目录下暂无内容。</div>`;
-    detailEl.innerHTML = "";
-    return;
-  }
-  list.forEach((n, i) => {
-    const type = n.type === "folder" ? "folder" : "note";
-    const card = makeCard(n, type);
-    card.style.transform = `translateX(${i * -6}px)`;
-    card.onclick = () => renderDetail(n);
-    childStack.appendChild(card);
-  });
-}
-
-function makeCard(node, type) {
-  const card = document.createElement("div");
-  card.className = `card ${type}`;
-  card.dataset.id = node.id;
-  const h = document.createElement("h3");
-  h.textContent = node.title;
-  const p = document.createElement("p");
-  p.textContent = node.summary || (node.type === "folder" ? "文件夹" : "Markdown 文档");
-  card.append(h, p);
-  return card;
-}
-
 function renderDetail(node) {
-  highlight(childStack, node.id);
   detailEl.innerHTML = "";
   const title = document.createElement("h2");
   title.textContent = node.title;
@@ -105,7 +71,7 @@ function renderDetail(node) {
     rail.className = "stack rail";
     children.forEach((c, i) => {
       const card = makeCard(c, c.type === "folder" ? "folder" : "note");
-      card.style.transform = `translateX(${i * -4}px)`;
+      card.style.transform = `translateX(${i * -8}px)`;
       card.onclick = () => renderDetail(c);
       rail.appendChild(card);
     });
@@ -117,17 +83,31 @@ function renderDetail(node) {
   }
 }
 
+function makeCard(node, type) {
+  const card = document.createElement("div");
+  card.className = `card ${type}`;
+  card.dataset.id = node.id;
+  const badge = document.createElement("span");
+  badge.className = "badge";
+  badge.textContent = type === "folder" ? "夹" : "MD";
+  const h = document.createElement("h3");
+  h.textContent = node.title;
+  const p = document.createElement("p");
+  p.textContent = node.summary || (node.type === "folder" ? "文件夹" : "Markdown 文档");
+  card.append(badge, h, p);
+  return card;
+}
+
 function highlight(container, id) {
   container.querySelectorAll(".card").forEach(card => {
     const active = card.dataset.id === id;
-    card.style.borderColor = active ? "rgba(113,196,255,0.6)" : "var(--border)";
+    card.classList.toggle("active", active);
   });
 }
 
 function renderEmpty(title, desc) {
   rootStack.innerHTML = "";
-  childStack.innerHTML = "";
-  heroTitle.textContent = title;
-  heroSummary.textContent = desc;
+  introTitle.textContent = title;
+  introSummary.textContent = desc;
   detailEl.innerHTML = `<p class="muted">${desc}</p>`;
 }
