@@ -5,7 +5,7 @@ const summaryEl = document.getElementById("summary");
 const breadcrumbEl = document.getElementById("breadcrumb");
 let nodes = new Map(), parent = new Map();
 
-fetch("assets/data/manifest.json")
+fetch("assets/data/manifest.json", { cache: "no-cache" })
   .then(r => r.json())
   .then(tree => {
     index(tree);
