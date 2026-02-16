@@ -4,36 +4,27 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>模块化作品库</title>
-  <link rel="stylesheet" href="assets/css/style.css?v=8" />
+  <link rel="stylesheet" href="assets/css/style.css?v=9" />
 </head>
 <body>
-  <div class="page">
+  <main class="page">
     <header class="top">
-      <div class="avatar-wrap">
-        <div class="avatar-box">
-          <img id="avatar" src="avatar/profile.jpg" alt="avatar" />
-        </div>
-        <p class="avatar-hint">头像绝对路径：F:\wcy\mymine\avatar\profile.jpg</p>
-        <p class="avatar-hint">头像仓库路径：avatar/profile.jpg</p>
+      <div class="avatar-box">
+        <img id="avatar" src="avatar/profile.jpg" alt="avatar" />
       </div>
-      <div class="intro">
+      <section class="intro">
         <p class="eyebrow">PORTFOLIO</p>
         <h1 id="intro-title">作品集</h1>
-        <p id="intro-summary">仅保留居中堆叠卡片，点击文件夹进入下一层。</p>
-      </div>
+        <p id="intro-summary">头像右侧用于简介。单击卡片切换到中间，双击中间文件夹进入下一级。</p>
+        <button id="back-btn" class="back-btn" type="button" hidden>返回上一级</button>
+      </section>
     </header>
 
-    <section class="workspace">
-      <div class="stack-header" id="stack-header">
-        <span>卡片堆叠</span>
-        <span class="hint">左右滑动 / 滚动</span>
-      </div>
-      <div class="stack-only">
-        <div class="stack-strip" id="stack"></div>
-      </div>
+    <section class="cards-root">
+      <div id="stack-stage" class="stack-stage"></div>
     </section>
-  </div>
+  </main>
 
-  <script src="assets/js/main.js?v=8"></script>
+  <script src="assets/js/main.js?v=9"></script>
 </body>
 </html>
