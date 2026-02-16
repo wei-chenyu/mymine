@@ -47,6 +47,11 @@ a { color: inherit; text-decoration: none; }
   object-fit: cover;
   border-radius: 26px;
 }
+.avatar-hint {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
 .intro h1 { margin: 6px 0 10px; font-size: 32px; }
 .intro p { margin: 0; line-height: 1.6; }
 .eyebrow { text-transform: uppercase; letter-spacing: 0.12em; font-size: 12px; color: var(--accent); margin: 0 0 4px; }
@@ -67,6 +72,9 @@ a { color: inherit; text-decoration: none; }
   overflow-x: auto;
   padding: 8px 6px 10px;
   scroll-snap-type: x mandatory;
+}
+.stack.rail.inner {
+  margin-top: 10px;
 }
 .stack.rail::-webkit-scrollbar { height: 6px; }
 .stack.rail::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 99px; }
@@ -107,6 +115,11 @@ a { color: inherit; text-decoration: none; }
   color: var(--accent);
   background: rgba(110,197,255,0.14);
   border: 1px solid rgba(110,197,255,0.3);
+}
+.card.back {
+  min-width: 150px;
+  text-align: left;
+  transform: none;
 }
 
 .detail {

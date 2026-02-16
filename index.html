@@ -4,13 +4,14 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>模块化作品库</title>
-  <link rel="stylesheet" href="assets/css/style.css?v=5" />
+  <link rel="stylesheet" href="assets/css/style.css?v=6" />
 </head>
 <body>
   <div class="page">
     <header class="top">
       <div class="avatar-box">
         <img id="avatar" src="avatar/profile.jpg" alt="avatar" />
+        <p class="avatar-hint">头像路径：avatar/profile.jpg</p>
       </div>
       <div class="intro">
         <p class="eyebrow">Portfolio</p>
@@ -20,16 +21,16 @@
     </header>
 
     <section class="stack-area">
-      <div class="stack-header">
-        <span>卡片堆叠 · 一级目录</span>
+      <div class="stack-header" id="stack-header">
+        <span>卡片堆叠</span>
         <span class="hint">左右滑动 / 滚动</span>
       </div>
-      <div class="stack rail" id="root-stack"></div>
+      <div class="stack rail" id="stack"></div>
     </section>
 
     <section class="detail" id="detail"></section>
   </div>
 
-  <script src="assets/js/main.js?v=5"></script>
+  <script src="assets/js/main.js?v=6"></script>
 </body>
 </html>
