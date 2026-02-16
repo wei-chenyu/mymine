@@ -1,58 +1,49 @@
 ﻿<!doctype html>
-<html lang="zh-CN">
+<html lang= zh-CN>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>我的小站</title>
-  <style>
-    :root {
-      --bg: radial-gradient(circle at 20% 20%, #1d2b64, #090a0f 55%);
-      --card: rgba(255,255,255,0.08);
-      --text: #f6f7fb;
-      --accent: #7dd3fc;
-      --muted: #9ca3af;
-    }
-    body {
-      margin: 0; min-height: 100vh; color: var(--text);
-      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-      background: var(--bg); display: grid; place-items: center; padding: 32px;
-    }
-    .card {
-      width: min(960px, 92vw); padding: 32px 36px;
-      background: var(--card); border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 20px; backdrop-filter: blur(8px);
-      box-shadow: 0 25px 60px rgba(0,0,0,0.35);
-    }
-    h1 { margin: 0 0 12px; font-size: 28px; letter-spacing: 0.5px; }
-    p { margin: 0 0 18px; color: var(--muted); line-height: 1.6; }
-    .gallery { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
-    .tile { position: relative; overflow: hidden; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); }
-    .tile img, .tile video { width: 100%; display: block; }
-    .chip { display: inline-block; padding: 6px 12px; border-radius: 999px;
-            background: rgba(125,211,252,0.18); color: var(--accent);
-            border: 1px solid rgba(125,211,252,0.4); font-size: 13px; }
-    footer { margin-top: 18px; font-size: 13px; color: var(--muted); }
-  </style>
+  <meta charset=utf-8 />
+  <meta name=viewport content=width=device-width initial-scale=1 />
+  <title>作品集 · 根目录</title>
+  <link rel=stylesheet href=assets/css/style.css />
 </head>
 <body>
-  <div class="card">
-    <span class="chip">Hello · 欢迎</span>
-    <h1>我的静态小站</h1>
-    <p>这里放文字、图片、视频链接都可以。把文件上传到仓库后，GitHub Pages 会自动展示。</p>
+  <div class=layout>
+    <aside class=sidebar>
+      <div class=logo>📂 我的作品集</div>
+      <ul class=tree>
+        <li><a class=label folder href=content/paintings/index.html>画作</a></li>
+        <li><a class=label folder href=content/code/index.html>编程作品</a></li>
+        <li><a class=label folder href=content/writing/index.html>文字 / 笔记</a></li>
+      </ul>
+      <div class=footer>像 Obsidian 一样：目录层层嵌套，页面间用链接跳转。</div>
+    </aside>
 
-    <div class="gallery">
-      <div class="tile">
-        <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80" alt="山景示例">
+    <main class=main>
+      <div class=header>
+        <div class=chip>根 · Overview</div>
+        <h1>欢迎来到我的作品集</h1>
+        <p>入口页。按类别浏览：画作系列、编程产品、文字记录。点击卡片进入对应文件夹。</p>
       </div>
-      <div class="tile">
-        <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=900&q=80" alt="人像示例">
-      </div>
-      <div class="tile">
-        <video src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" controls></video>
-      </div>
-    </div>
 
-    <footer>© 2026 Your Name · Edit index.html 自定义内容</footer>
+      <section class=section-grid>
+        <a class=card href=content/paintings/index.html>
+          <div class=chip>画作</div>
+          <h3>Painting Library</h3>
+          <p class=desc>按主题（风景 / 人像 / 速写等）分类的画作墙，可继续下钻到更细子文件夹。</p>
+        </a>
+        <a class=card href=content/code/index.html>
+          <div class=chip>编程</div>
+          <h3>Code & Product Demos</h3>
+          <p class=desc>包含视频、截图、仓库链接的项目展示区。</p>
+        </a>
+        <a class=card href=content/writing/index.html>
+          <div class=chip>文字</div>
+          <h3>Writing / Notes</h3>
+          <p class=desc>纯文本或长文记录，可作为项目背后的故事或创作笔记。</p>
+        </a>
+      </section>
+    </main>
   </div>
+  <script src=assets/js/main.js></script>
 </body>
 </html>
