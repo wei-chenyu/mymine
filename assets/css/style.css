@@ -67,16 +67,19 @@ body {
 }
 
 .intro { align-self: center; }
+
 .eyebrow {
   margin: 0 0 8px;
   color: var(--accent);
   font-size: 25px;
   letter-spacing: 0.18em;
 }
+
 .intro h1 {
   margin: 0 0 10px;
   font-size: 58px;
 }
+
 .intro p {
   margin: 0;
   font-size: 34px;
@@ -102,19 +105,20 @@ body {
 
 .hint { font-size: 24px; }
 
-.workspace-body {
+.stack-only {
   display: grid;
-  grid-template-columns: 620px 1fr;
-  gap: 10px;
-  min-height: 360px;
+  place-items: center;
+  min-height: 420px;
 }
 
 .stack-strip {
+  width: min(980px, 100%);
+  min-height: 360px;
   position: relative;
   overflow-x: auto;
   overflow-y: visible;
   white-space: nowrap;
-  padding: 14px 8px 16px 10px;
+  padding: 22px 18px 20px 20px;
   background: #0b2040;
   border: 1px solid rgba(160, 202, 255, 0.18);
   border-radius: 18px;
@@ -183,48 +187,17 @@ body {
   background: #123559;
 }
 
-.detail-pane {
-  border: 1px solid rgba(160, 202, 255, 0.22);
-  border-radius: 18px;
-  background: #0d2648;
-  padding: 16px;
-  min-height: 340px;
-}
-
-.detail-pane h2 {
-  margin: 0 0 8px;
-  font-size: 52px;
-}
-
-.detail-pane .meta {
-  margin: 0 0 14px;
-  color: var(--muted);
-  font-size: 32px;
-}
-
-.detail-pane article {
-  font-size: 26px;
-  line-height: 1.65;
-}
-
-.detail-pane img,
-.detail-pane video {
-  max-width: 100%;
-  border-radius: 12px;
-  border: 1px solid rgba(160, 202, 255, 0.22);
-}
-
 @media (max-width: 1280px) {
   .intro h1 { font-size: 42px; }
-  .intro p, .card p, .detail-pane .meta { font-size: 24px; }
-  .card h3, .detail-pane h2 { font-size: 34px; }
-  .workspace-body { grid-template-columns: 470px 1fr; }
+  .intro p, .card p { font-size: 24px; }
+  .card h3 { font-size: 34px; }
   .card { width: 260px; margin-right: -170px; }
   .badge { font-size: 16px; }
+  .stack-strip { min-height: 280px; }
+  .stack-only { min-height: 320px; }
 }
 
 @media (max-width: 980px) {
   .top { grid-template-columns: 1fr; }
-  .workspace-body { grid-template-columns: 1fr; }
-  .stack-strip { min-height: 210px; }
+  .intro p { font-size: 22px; }
 }
