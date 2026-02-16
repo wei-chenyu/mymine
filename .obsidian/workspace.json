@@ -11,10 +11,12 @@
             "id": "92c0ac730be54bf8",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
-              "icon": "lucide-file",
-              "title": "新标签页"
+              "type": "image",
+              "state": {
+                "file": "content/旧日梦预/)BO(0(L92V6CT(@O(VL6J)S.jpg"
+              },
+              "icon": "lucide-image",
+              "title": ")BO(0(L92V6CT(@O(VL6J)S"
             }
           }
         ]
@@ -90,6 +92,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "content/旧日梦预/)BO(0(L92V6CT(@O(VL6J)S.jpg",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -99,7 +102,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "反向链接"
+              "title": ")BO(0(L92V6CT(@O(VL6J)S 的反向链接列表"
             }
           },
           {
@@ -108,11 +111,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "content/旧日梦预/)BO(0(L92V6CT(@O(VL6J)S.jpg",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "出链"
+              "title": ")BO(0(L92V6CT(@O(VL6J)S 的出链列表"
             }
           },
           {
@@ -150,12 +154,13 @@
             "state": {
               "type": "outline",
               "state": {
+                "file": "content/旧日梦预/)BO(0(L92V6CT(@O(VL6J)S.jpg",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "大纲"
+              "title": ")BO(0(L92V6CT(@O(VL6J)S 的大纲"
             }
           }
         ]
@@ -176,8 +181,10 @@
       "bases:新建数据库": false
     }
   },
-  "active": "fb0701b539b78951",
+  "active": "92c0ac730be54bf8",
   "lastOpenFiles": [
+    "content/旧日梦预/)BO(0(L92V6CT(@O(VL6J)S.jpg",
+    "content/旧日梦预",
     "content/？",
     "assets/data/manifest.json",
     "assets/data",
@@ -191,8 +198,6 @@
     "node_modules/marked/lib/marked.esm.js.map",
     "node_modules/js-yaml/README.md",
     "node_modules/js-yaml/package.json",
-    "node_modules/js-yaml/lib/js-yaml/type/js/undefined.js",
-    "node_modules/js-yaml/lib/js-yaml/type.js",
     "node_modules/kind-of/README.md",
     "node_modules/gray-matter/CHANGELOG.md",
     "node_modules/argparse/CHANGELOG.md",

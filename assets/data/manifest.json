@@ -1,5 +1,12 @@
 {
   "id": "root",
   "title": "内容库",
-  "children": []
+  "children": [
+    {
+      "id": "旧日梦预",
+      "type": "folder",
+      "title": "旧日梦预",
+      "children": []
+    }
+  ]
 }
