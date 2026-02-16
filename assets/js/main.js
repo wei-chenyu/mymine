@@ -1,6 +1,4 @@
 const avatarEl = document.getElementById("avatar");
-const introTitle = document.getElementById("intro-title");
-const introSummary = document.getElementById("intro-summary");
 const stageEl = document.getElementById("stack-stage");
 const backBtn = document.getElementById("back-btn");
 
@@ -24,19 +22,15 @@ fetch("assets/data/manifest.json", { cache: "no-cache" })
     const roots = tree.children || [];
     if (!roots.length) {
       renderEmpty("暂无内容，请在 content 里添加文件夹或 Markdown。");
-      introTitle.textContent = "暂无内容";
-      introSummary.textContent = "运行 node scripts/build-manifest.js 后刷新页面。";
       return;
     }
     state.list = roots;
     state.center = 0;
-    updateIntro(state.list[state.center]);
     render();
   })
   .catch((err) => {
     renderEmpty("加载失败");
-    introTitle.textContent = "加载失败";
-    introSummary.textContent = String(err);
+    console.error(err);
   });
 
 function render() {
@@ -82,7 +76,6 @@ function render() {
 function onCardClick(index) {
   if (index !== state.center) {
     state.center = index;
-    updateIntro(state.list[state.center]);
     render();
     return;
   }
@@ -91,17 +84,13 @@ function onCardClick(index) {
   if (node.type === "folder") {
     state.path.push({
       list: state.list,
-      center: state.center,
-      parentTitle: node.title || "目录"
+      center: state.center
     });
     state.list = node.children || [];
     state.center = 0;
-    updateIntro(node);
     render();
     return;
   }
-
-  updateIntro(node);
 }
 
 function goBack() {
@@ -109,26 +98,11 @@ function goBack() {
   if (!last) return;
   state.list = last.list;
   state.center = Math.min(last.center, Math.max(0, state.list.length - 1));
-  updateIntro(state.list[state.center] || { title: last.parentTitle, type: "folder", summary: "已返回上一级。" });
   render();
 }
 
 function toggleBack() {
   backBtn.hidden = state.path.length === 0;
-}
-
-function updateIntro(node) {
-  const title = node?.title || "未命名";
-  introTitle.textContent = title;
-
-  if (node?.type === "note") {
-    const text = htmlToText(node.html || "");
-    introSummary.textContent = text ? text.slice(0, 130) : "Markdown 文档";
-    return;
-  }
-
-  const count = (node?.children || []).length;
-  introSummary.textContent = node?.summary || `文件夹，包含 ${count} 个子项。`;
 }
 
 function renderEmpty(text) {
@@ -141,12 +115,6 @@ function shortestOffset(index, center, total) {
   if (raw > half) return raw - total;
   if (raw < -half) return raw + total;
   return raw;
-}
-
-function htmlToText(html) {
-  const div = document.createElement("div");
-  div.innerHTML = html;
-  return (div.textContent || div.innerText || "").trim();
 }
 
 function escapeHtml(text) {
