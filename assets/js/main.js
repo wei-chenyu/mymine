@@ -9,9 +9,14 @@ fetch("assets/data/manifest.json")
   .then(r => r.json())
   .then(tree => {
     index(tree);
-    treeEl.appendChild(renderTree(tree.children || []));
-    const first = tree.children?.[0];
-    if (first) select(first.id);
+    const kids = tree.children || [];
+    if (!kids.length) {
+      treeEl.textContent = "暂无内容，请在 content/ 下新增文件夹或 Markdown 再运行构建。";
+      renderEmpty();
+      return;
+    }
+    treeEl.appendChild(renderTree(kids));
+    select(kids[0].id);
   })
   .catch(err => { contentEl.textContent = "加载清单失败: " + err; });
 
@@ -75,4 +80,11 @@ function renderBlocks(n) {
   wrap.className = "block";
   wrap.innerHTML = n.html || "<p class='muted'>空文档</p>";
   contentEl.appendChild(wrap);
+}
+
+function renderEmpty() {
+  breadcrumbEl.textContent = "";
+  titleEl.textContent = "暂无内容";
+  summaryEl.textContent = "在 content/ 中添加 Markdown 或文件夹，然后重新运行 manifest 构建。";
+  contentEl.innerHTML = "<p class='muted'>还没有任何文件。</p>";
 }

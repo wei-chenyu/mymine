@@ -1,12 +1,5 @@
 {
   "id": "root",
   "title": "内容库",
-  "children": [
-    {
-      "id": "？",
-      "type": "folder",
-      "title": "？",
-      "children": []
-    }
-  ]
+  "children": []
 }
