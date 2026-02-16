@@ -6,7 +6,15 @@
       "id": "旧日梦预",
       "type": "folder",
       "title": "旧日梦预",
-      "children": []
+      "children": [
+        {
+          "id": "旧日梦预/未命名.md",
+          "type": "note",
+          "title": "未命名.md",
+          "summary": "",
+          "html": "<p>![[白旬.jpg]]</p>\n"
+        }
+      ]
     }
   ]
 }

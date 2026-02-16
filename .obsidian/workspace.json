@@ -11,12 +11,14 @@
             "id": "92c0ac730be54bf8",
             "type": "leaf",
             "state": {
-              "type": "image",
+              "type": "markdown",
               "state": {
-                "file": "content/旧日梦预/)BO(0(L92V6CT(@O(VL6J)S.jpg"
+                "file": "content/旧日梦预/未命名.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "lucide-image",
-              "title": ")BO(0(L92V6CT(@O(VL6J)S"
+              "icon": "lucide-file",
+              "title": "未命名"
             }
           }
         ]
@@ -92,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "content/旧日梦预/)BO(0(L92V6CT(@O(VL6J)S.jpg",
+                "file": "content/旧日梦预/未命名.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": ")BO(0(L92V6CT(@O(VL6J)S 的反向链接列表"
+              "title": "未命名 的反向链接列表"
             }
           },
           {
@@ -111,12 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "content/旧日梦预/)BO(0(L92V6CT(@O(VL6J)S.jpg",
+                "file": "content/旧日梦预/未命名.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": ")BO(0(L92V6CT(@O(VL6J)S 的出链列表"
+              "title": "未命名 的出链列表"
             }
           },
           {
@@ -154,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "content/旧日梦预/)BO(0(L92V6CT(@O(VL6J)S.jpg",
+                "file": "content/旧日梦预/未命名.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": ")BO(0(L92V6CT(@O(VL6J)S 的大纲"
+              "title": "未命名 的大纲"
             }
           }
         ]
@@ -183,7 +185,8 @@
   },
   "active": "92c0ac730be54bf8",
   "lastOpenFiles": [
-    "content/旧日梦预/)BO(0(L92V6CT(@O(VL6J)S.jpg",
+    "content/旧日梦预/白旬.jpg",
+    "content/旧日梦预/未命名.md",
     "content/旧日梦预",
     "content/？",
     "assets/data/manifest.json",
