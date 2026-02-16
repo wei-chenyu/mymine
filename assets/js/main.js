@@ -1,4 +1,5 @@
-// 完全自由的示例树：你可任意增删、改标题、改内容类型。
+// 这是最小示例：只有一个根节点和一个可删除的示例子节点。
+// 你可以把 children 数组清空，然后按需要添加任意节点树。
 const treeData = {
   id: 'root',
   title: '工作区',
@@ -6,32 +7,14 @@ const treeData = {
   blocks: [],
   children: [
     {
-      id: 'node-a',
-      title: '节点 A',
-      summary: '示例：纯文本说明',
+      id: 'example',
+      title: '示例节点（可删）',
+      summary: '演示块组合',
       blocks: [
-        { type: 'text', html: '<p>这里是一个普通节点，写什么都行。用 HTML 自由排版。</p>' },
+        { type: 'text', html: '<p>这是示例文本，改成你自己的内容。</p>' },
+        { type: 'image', src: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80', alt: '示例图' }
       ],
-      children: [
-        {
-          id: 'node-a1',
-          title: '子节点 A1',
-          summary: '示例：再下一层',
-          blocks: [
-            { type: 'text', html: '<p>可继续嵌套更多层级。</p>' }
-          ]
-        }
-      ]
-    },
-    {
-      id: 'node-b',
-      title: '节点 B',
-      summary: '示例：图 + 视频混排',
-      blocks: [
-        { type: 'image', src: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80', alt: '示例图', caption: '示例图片，可换成本地相对路径' },
-        { type: 'video', src: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4', caption: '示例视频，可换 ../media/your.mp4' },
-        { type: 'link', href: 'https://github.com/wei-chenyu/mymine', label: '示例链接' }
-      ]
+      children: []
     }
   ]
 };
