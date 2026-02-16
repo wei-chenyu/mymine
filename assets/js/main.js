@@ -1,57 +1,36 @@
-﻿const treeData = {
+// 完全自由的示例树：你可任意增删、改标题、改内容类型。
+const treeData = {
   id: 'root',
   title: '工作区',
-  summary: '自由嵌套的模块树，每个节点都能承载图文/视频内容。',
-  blocks: [
-    { type: 'text', html: '<p>欢迎！左侧点击任何节点即可查看内容。你可以在 <code>treeData</code> 里自由增删层级，像 Obsidian 那样组织。</p>' },
-  ],
+  summary: '自由嵌套的模块树；每个节点都能放文字、图片、视频、链接。',
+  blocks: [],
   children: [
     {
-      id: 'gallery',
-      title: '画册 / Gallery',
-      summary: '示例：混排图片与文本。',
+      id: 'node-a',
+      title: '节点 A',
+      summary: '示例：纯文本说明',
       blocks: [
-        { type: 'text', html: '<h2>画册封面</h2><p>这里放系列简介、创作理念等。</p>' },
-        { type: 'image', src: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80', alt: '山路', caption: '示例图 1' },
-        { type: 'image', src: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1600&q=80', alt: '湖泊', caption: '示例图 2' },
+        { type: 'text', html: '<p>这里是一个普通节点，写什么都行。用 HTML 自由排版。</p>' },
       ],
       children: [
         {
-          id: 'gallery-landscape',
-          title: '子文件夹 · 风景',
-          summary: '可以继续分系列。',
+          id: 'node-a1',
+          title: '子节点 A1',
+          summary: '示例：再下一层',
           blocks: [
-            { type: 'text', html: '<p>把你的风景作品放进这一层，或者再往下拆分。</p>' },
-            { type: 'image', src: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80', alt: '海浪' }
-          ]
-        },
-        {
-          id: 'gallery-portrait',
-          title: '子文件夹 · 人像',
-          summary: '另一套系列。',
-          blocks: [
-            { type: 'image', src: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1400&q=80', alt: '人像' },
-            { type: 'text', html: '<p>支持写长文说明，或链接到外部视频。</p>' }
+            { type: 'text', html: '<p>可继续嵌套更多层级。</p>' }
           ]
         }
       ]
     },
     {
-      id: 'dev',
-      title: '产品 / 代码演示',
-      summary: '放视频、截图、链接。',
+      id: 'node-b',
+      title: '节点 B',
+      summary: '示例：图 + 视频混排',
       blocks: [
-        { type: 'video', src: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4', caption: '示例视频，换成 ../media/your-demo.mp4 即可' },
-        { type: 'text', html: '<p>可以附加 GitHub 仓库链接、技术栈说明等。</p>' },
-        { type: 'link', href: 'https://github.com/wei-chenyu/mymine', label: 'GitHub: mymine' }
-      ]
-    },
-    {
-      id: 'notes',
-      title: '随笔 / 文本',
-      summary: '纯文本或混排都行。',
-      blocks: [
-        { type: 'text', html: '<h2>一则示例笔记</h2><p>用 HTML 写段落、列表、代码都可以。<br>也可把 Markdown 预先转成 HTML 粘贴。</p>' }
+        { type: 'image', src: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80', alt: '示例图', caption: '示例图片，可换成本地相对路径' },
+        { type: 'video', src: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4', caption: '示例视频，可换 ../media/your.mp4' },
+        { type: 'link', href: 'https://github.com/wei-chenyu/mymine', label: '示例链接' }
       ]
     }
   ]
