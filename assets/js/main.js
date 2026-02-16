@@ -1,140 +1,78 @@
-// 这是最小示例：只有一个根节点和一个可删除的示例子节点。
-// 你可以把 children 数组清空，然后按需要添加任意节点树。
-const treeData = {
-  id: 'root',
-  title: '工作区',
-  summary: '自由嵌套的模块树；每个节点都能放文字、图片、视频、链接。',
-  blocks: [],
-  children: [
-    {
-      id: 'example',
-      title: '示例节点（可删）',
-      summary: '演示块组合',
-      blocks: [
-        { type: 'text', html: '<p>这是示例文本，改成你自己的内容。</p>' },
-        { type: 'image', src: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80', alt: '示例图' }
-      ],
-      children: []
-    }
-  ]
-};
+const treeEl = document.getElementById("tree");
+const contentEl = document.getElementById("content");
+const titleEl = document.getElementById("title");
+const summaryEl = document.getElementById("summary");
+const breadcrumbEl = document.getElementById("breadcrumb");
+let nodes = new Map(), parent = new Map();
 
-const nodes = new Map();
-const parentOf = new Map();
-(function index(node, parent = null) {
+fetch("assets/data/manifest.json")
+  .then(r => r.json())
+  .then(tree => {
+    index(tree);
+    treeEl.appendChild(renderTree(tree.children || []));
+    const first = tree.children?.[0];
+    if (first) select(first.id);
+  })
+  .catch(err => { contentEl.textContent = "加载清单失败: " + err; });
+
+function index(node, p = null) {
   nodes.set(node.id, node);
-  if (parent) parentOf.set(node.id, parent.id);
-  (node.children || []).forEach(child => index(child, node));
-})(treeData);
+  if (p) parent.set(node.id, p.id);
+  (node.children || []).forEach(c => index(c, node));
+}
 
-const treeContainer = document.getElementById('tree');
-const contentEl = document.getElementById('content');
-const titleEl = document.getElementById('title');
-const summaryEl = document.getElementById('summary');
-const breadcrumbEl = document.getElementById('breadcrumb');
-let current = null;
-
-function renderTree(node) {
-  const ul = document.createElement('ul');
-  ul.className = 'tree';
-  (node.children || []).forEach(child => {
-    const li = document.createElement('li');
-    const btn = document.createElement('button');
-    btn.className = 'tree-btn';
-    btn.textContent = child.title;
-    btn.dataset.id = child.id;
+function renderTree(list) {
+  const ul = document.createElement("ul");
+  ul.className = "tree";
+  list.forEach(n => {
+    const li = document.createElement("li");
+    const btn = document.createElement("button");
+    btn.className = "tree-btn";
+    btn.textContent = n.title;
+    btn.dataset.id = n.id;
     li.appendChild(btn);
-    if (child.children && child.children.length) {
-      li.appendChild(renderTree(child));
-    }
+    if (n.type === "folder" && n.children?.length) li.appendChild(renderTree(n.children));
     ul.appendChild(li);
+  });
+  ul.addEventListener("click", e => {
+    const b = e.target.closest(".tree-btn");
+    if (b) select(b.dataset.id);
   });
   return ul;
 }
 
-treeContainer.appendChild(renderTree(treeData));
-
-treeContainer.addEventListener('click', (e) => {
-  const btn = e.target.closest('.tree-btn');
-  if (!btn) return;
-  const node = nodes.get(btn.dataset.id);
-  if (node) select(node);
-});
-
-function select(node) {
-  current = node;
-  titleEl.textContent = node.title;
-  summaryEl.textContent = node.summary || '';
-  breadcrumbEl.textContent = breadcrumb(node).join(' / ');
-  renderBlocks(node.blocks || []);
-  highlight(node.id);
+function select(id) {
+  const n = nodes.get(id);
+  if (!n) return;
+  titleEl.textContent = n.title;
+  summaryEl.textContent = n.summary || (n.type === "folder" ? "文件夹" : "");
+  breadcrumbEl.textContent = breadcrumb(n).join(" / ");
+  renderBlocks(n);
+  document.querySelectorAll(".tree-btn").forEach(b => b.classList.toggle("active", b.dataset.id === id));
 }
 
-function breadcrumb(node) {
+function breadcrumb(n) {
   const path = [];
-  let n = node;
-  while (n) {
-    path.unshift(n.title);
-    const pid = parentOf.get(n.id);
-    n = pid ? nodes.get(pid) : null;
-  }
+  while (n) { path.unshift(n.title); n = parent.get(n.id) ? nodes.get(parent.get(n.id)) : null; }
   return path;
 }
 
-function renderBlocks(blocks) {
-  contentEl.innerHTML = '';
-  if (!blocks.length) {
-    const empty = document.createElement('p');
-    empty.className = 'muted';
-    empty.textContent = '这个节点还没有内容。';
-    contentEl.appendChild(empty);
+function renderBlocks(n) {
+  contentEl.innerHTML = "";
+  if (n.type === "folder") {
+    const list = document.createElement("ul");
+    list.className = "child-list";
+    (n.children || []).forEach(c => {
+      const li = document.createElement("li");
+      li.textContent = `${c.type === "folder" ? "📁" : "📝"} ${c.title}`;
+      li.onclick = () => select(c.id);
+      list.appendChild(li);
+    });
+    contentEl.appendChild(list);
     return;
   }
-  blocks.forEach(block => {
-    const wrap = document.createElement('div');
-    wrap.className = 'block';
-    if (block.type === 'text') {
-      wrap.innerHTML = block.html || '';
-    } else if (block.type === 'image') {
-      const fig = document.createElement('figure');
-      const img = document.createElement('img');
-      img.src = block.src;
-      img.alt = block.alt || '';
-      fig.appendChild(img);
-      if (block.caption) {
-        const cap = document.createElement('figcaption');
-        cap.textContent = block.caption;
-        fig.appendChild(cap);
-      }
-      wrap.appendChild(fig);
-    } else if (block.type === 'video') {
-      const vid = document.createElement('video');
-      vid.controls = true;
-      vid.src = block.src;
-      wrap.appendChild(vid);
-      if (block.caption) {
-        const cap = document.createElement('div');
-        cap.className = 'muted';
-        cap.textContent = block.caption;
-        wrap.appendChild(cap);
-      }
-    } else if (block.type === 'link') {
-      const a = document.createElement('a');
-      a.href = block.href;
-      a.target = '_blank';
-      a.rel = 'noreferrer';
-      a.textContent = block.label || block.href;
-      wrap.appendChild(a);
-    }
-    contentEl.appendChild(wrap);
-  });
-}
-
-function highlight(id) {
-  document.querySelectorAll('.tree-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.id === id));
-}
-
-// 默认选中第一项
-if (treeData.children?.length) {
-  select(treeData.children[0]);
+  const wrap = document.createElement("article");
+  wrap.className = "block";
+  wrap.innerHTML = n.html || "<p class='muted'>空文档</p>";
+  contentEl.appendChild(wrap);
 }
