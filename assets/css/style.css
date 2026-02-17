@@ -279,22 +279,22 @@ body.custom-bg {
   letter-spacing: 0.04em;
 }
 
-.node.is-centered .node-card:hover .fan-note {
+.node.is-centered.expand-armed .node-card:hover .fan-note {
   opacity: 1;
 }
 
-.node.is-centered .node-card:hover .fan-note:nth-child(1) {
-  transform: translate(-84px, 6px) rotate(-8deg) scale(0.99);
+.node.is-centered.expand-armed .node-card:hover .fan-note:nth-child(1) {
+  transform: translate(-58px, 4px) rotate(-7deg) scale(0.99);
   z-index: 3;
 }
 
-.node.is-centered .node-card:hover .fan-note:nth-child(2) {
-  transform: translate(-160px, 0px) rotate(-5deg) scale(0.97);
+.node.is-centered.expand-armed .node-card:hover .fan-note:nth-child(2) {
+  transform: translate(-110px, 0px) rotate(-5deg) scale(0.97);
   z-index: 2;
 }
 
-.node.is-centered .node-card:hover .fan-note:nth-child(3) {
-  transform: translate(-232px, -6px) rotate(-2deg) scale(0.95);
+.node.is-centered.expand-armed .node-card:hover .fan-note:nth-child(3) {
+  transform: translate(-156px, -4px) rotate(-2deg) scale(0.95);
   z-index: 1;
 }
 

@@ -172,6 +172,19 @@ function normalizePath(p) {
   return s;
 }
 
+function clamp(v, min, max) {
+  return Math.min(max, Math.max(min, v));
+}
+
+function getLevelSpacing(levelCount, containerW) {
+  // 卡片越多，间距越小；越少，间距越大
+  const density = clamp((Math.max(1, levelCount) - 3) / 9, 0, 1);
+  const ratio = 0.52 - density * 0.18;      // 3 张: 0.52, 12+ 张: 0.34
+  const minSpacing = 104 - density * 38;    // 3 张: 104, 12+ 张: 66
+  const maxSpacing = 196 - density * 66;    // 3 张: 196, 12+ 张: 130
+  return Math.min(maxSpacing, Math.max(minSpacing, (containerW * ratio) / Math.max(levelCount, 2)));
+}
+
 // ========== 环形位置计算 ==========
 // 返回 idx 相对于 focusIdx 的环形偏移量
 // 偶数时右侧多一张：leftCount = floor((N-1)/2), rightCount = N-1-leftCount
@@ -217,6 +230,7 @@ function layoutAll() {
   const container = treeRootEl;
   const activeLevel = state.levels.length - 1;
   const containerW = container.clientWidth || 1200;
+  const activeCount = state.levels[activeLevel]?.nodes?.length || 1;
 
   state.levels.forEach((level, L) => {
     const cards = [...container.querySelectorAll(`[data-level="${L}"]`)];
@@ -225,7 +239,7 @@ function layoutAll() {
     const C = level.focusIndex;
     const isActive = L === activeLevel;
 
-    const spacing = Math.min(260, Math.max(140, (containerW * 0.7) / Math.max(N, 2)));
+    const spacing = getLevelSpacing(activeCount, containerW);
 
     cards.forEach(el => {
       const idx = parseInt(el.dataset.idx);
@@ -275,6 +289,7 @@ function layoutAll() {
 
       const isCentered = isActive && pos === 0;
       el.classList.toggle('is-centered', isCentered);
+      if (!isCentered) el.classList.remove('expand-armed');
       el.dataset.ringPos = String(pos);
     });
   });
@@ -387,6 +402,12 @@ function collapseToLevel(targetLevel) {
 function bindCardEvents(el, node, level, idx) {
   // 悬停 → 延迟后轮盘旋转到该卡片为中心
   el.addEventListener('mouseenter', () => {
+    if (el.classList.contains('is-centered')) {
+      el.classList.add('expand-armed');
+    } else {
+      el.classList.remove('expand-armed');
+    }
+
     const currentActive = state.levels.length - 1;
     if (level === currentActive && !state.transitioning) {
       if (Date.now() < state.hoverLockedUntil) return;
@@ -404,6 +425,7 @@ function bindCardEvents(el, node, level, idx) {
 
   el.addEventListener('mouseleave', () => {
     clearTimeout(hoverTimer);
+    el.classList.remove('expand-armed');
   });
 
   el.querySelector('.node-card').addEventListener('click', e => {
