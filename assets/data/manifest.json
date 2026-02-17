@@ -21,15 +21,15 @@
               "type": "note",
               "title": "二级文件",
               "summary": "",
-              "html": "<p><img src=\"content/%E4%B8%80%E7%BA%A71/%E4%BA%8C%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg\" alt=\"白旬.jpg\"></p>\n",
+              "html": "<p><img src=\"%E7%99%BD%E6%97%AC.jpg\" alt=\"白旬.jpg\"></p>\n",
               "images": [
-                "content/%E4%B8%80%E7%BA%A71/%E4%BA%8C%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg"
+                "%E7%99%BD%E6%97%AC.jpg"
               ],
               "textContent": "![[白旬.jpg]]"
             }
           ],
           "images": [
-            "content/%E4%B8%80%E7%BA%A71/%E4%BA%8C%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg"
+            "%E7%99%BD%E6%97%AC.jpg"
           ],
           "coverImage": null
         },
@@ -38,15 +38,15 @@
           "type": "note",
           "title": "二级文件 1",
           "summary": "",
-          "html": "<p><img src=\"%E7%99%BD%E6%97%AC.jpg\" alt=\"白旬.jpg\"></p>\n",
+          "html": "<p><img src=\"content/%E4%B8%80%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg\" alt=\"白旬.jpg\"></p>\n",
           "images": [
-            "%E7%99%BD%E6%97%AC.jpg"
+            "content/%E4%B8%80%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg"
           ],
           "textContent": "![[白旬.jpg]]"
         }
       ],
       "images": [
-        "%E7%99%BD%E6%97%AC.jpg"
+        "content/%E4%B8%80%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg"
       ],
       "coverImage": null
     },

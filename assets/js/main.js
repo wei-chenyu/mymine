@@ -4,113 +4,187 @@ const profileContentEl = document.getElementById("profile-content");
 const treeRootEl = document.getElementById("tree-root");
 
 if (avatarEl) {
-  avatarEl.onerror = () => {
-    avatarEl.src = "assets/img/avatar-fallback.svg";
-  };
+  avatarEl.onerror = () => { avatarEl.src = "assets/img/avatar-fallback.svg"; };
 }
 
 const state = {
   tree: {},
   activeFile: null,
-  // 轮播状态
+  // 导航栈：每一层记录 { nodes, centerIndex, folderTitle }
+  navStack: [],
+  currentNodes: [],
   centerIndex: 0,
   hoveredIndex: -1,
-  currentNodes: [],       // 当前显示的顶层节点列表
-  expandedOverlay: null,  // 当前展开的 overlay DOM
-  expandedNodeId: null    // 当前展开的文件夹 id
+  transitioning: false
 };
 
-// 初始化：加载 manifest
-fetch("assets/data/manifest.json", { cache: "no-cache" })
-  .then((r) => r.json())
-  .then((tree) => {
-    if (tree.profile) renderProfile(tree.profile);
+// ========== 初始化 ==========
 
+fetch("assets/data/manifest.json", { cache: "no-cache" })
+  .then(r => r.json())
+  .then(tree => {
+    if (tree.profile) renderProfile(tree.profile);
     if (!tree.children || tree.children.length === 0) {
       renderEmpty("暂无内容，请在 content 里添加文件夹或 Markdown。");
       return;
     }
-
     state.tree = tree;
     state.currentNodes = tree.children;
     state.centerIndex = Math.floor(tree.children.length / 2);
-    renderCarousel(treeRootEl, state.currentNodes, state.centerIndex);
+    mountCards(treeRootEl, state.currentNodes, 0); // originX=0，从中心出现
+    renderBreadcrumb();
   })
-  .catch((err) => {
+  .catch(err => {
     renderEmpty("加载失败");
     console.error(err);
   });
 
-// 渲染个人简介
 function renderProfile(profile) {
   if (profileTitleEl && profile.title) profileTitleEl.textContent = profile.title;
   if (profileContentEl) profileContentEl.innerHTML = profile.html || "<p>profile.md 为空。</p>";
 }
 
-// 渲染空状态
 function renderEmpty(text) {
   treeRootEl.innerHTML = `<div class="empty">${escapeHtml(text)}</div>`;
 }
 
-// ========== 轮播渲染 ==========
+// ========== 面包屑 ==========
 
-function renderCarousel(container, nodes, centerIdx) {
-  container.innerHTML = '';
-  if (!nodes || nodes.length === 0) {
-    renderEmpty("该目录为空。");
+function renderBreadcrumb() {
+  let bc = document.getElementById('breadcrumb');
+  if (!bc) {
+    bc = document.createElement('nav');
+    bc.id = 'breadcrumb';
+    bc.className = 'breadcrumb';
+    treeRootEl.parentElement.insertBefore(bc, treeRootEl);
+  }
+
+  if (state.navStack.length === 0) {
+    bc.style.display = 'none';
     return;
   }
 
-  const count = nodes.length;
+  bc.style.display = '';
+  bc.innerHTML = '';
 
-  nodes.forEach((node, i) => {
-    const nodeEl = createCardElement(node);
-    nodeEl.dataset.carouselIndex = i;
-    container.appendChild(nodeEl);
+  // 根目录
+  const rootSpan = document.createElement('span');
+  rootSpan.className = 'bc-item';
+  rootSpan.textContent = '首页';
+  rootSpan.addEventListener('click', () => navigateToLevel(0));
+  bc.appendChild(rootSpan);
 
-    // 悬停：向中间聚拢
-    nodeEl.addEventListener('mouseenter', () => {
-      state.hoveredIndex = i;
-      layoutCarousel(container, count, centerIdx);
-    });
+  // 每一层
+  state.navStack.forEach((entry, i) => {
+    const sep = document.createElement('span');
+    sep.className = 'bc-sep';
+    sep.textContent = ' › ';
+    bc.appendChild(sep);
 
-    nodeEl.addEventListener('mouseleave', () => {
-      state.hoveredIndex = -1;
-      layoutCarousel(container, count, centerIdx);
-    });
-
-    // 点击
-    nodeEl.querySelector('.node-card').addEventListener('click', (e) => {
-      e.stopPropagation();
-      handleNodeClick(node);
-    });
+    const isLast = i === state.navStack.length - 1;
+    const item = document.createElement('span');
+    item.className = isLast ? 'bc-item bc-current' : 'bc-item';
+    item.textContent = entry.folderTitle;
+    if (!isLast) {
+      item.addEventListener('click', () => navigateToLevel(i + 1));
+    }
+    bc.appendChild(item);
   });
-
-  layoutCarousel(container, count, centerIdx);
 }
 
-// 计算轮播布局位置
-function layoutCarousel(container, count, centerIdx) {
-  const nodeEls = container.querySelectorAll(':scope > .node');
-  const spacing = 200; // 每张卡片间距（px）
-  const scaleStep = 0.1; // 每远离中心缩小的比例
+// ========== 轮播：创建卡片并布局 ==========
+
+function mountCards(container, nodes, originX) {
+  if (!nodes || nodes.length === 0) {
+    container.innerHTML = '<div class="empty" style="position:relative;">该目录为空</div>';
+    return;
+  }
+
+  state.centerIndex = Math.floor(nodes.length / 2);
+  state.hoveredIndex = -1;
+
+  nodes.forEach((node, i) => {
+    const el = createCardElement(node);
+    el.dataset.idx = i;
+
+    // 初始：全部聚在 originX 处，缩小透明
+    el.style.transition = 'none';
+    el.style.transform = `translateX(${originX}px) scale(0.35)`;
+    el.style.opacity = '0';
+    container.appendChild(el);
+
+    bindCardEvents(el, node, i, container);
+  });
+
+  // 下一帧：开启 transition，展开到目标位置
+  requestAnimationFrame(() => {
+    container.querySelectorAll(':scope > .node').forEach(el => {
+      el.style.transition = '';
+    });
+    requestAnimationFrame(() => {
+      layoutCards(container);
+    });
+  });
+}
+
+function bindCardEvents(el, node, idx, container) {
+  el.addEventListener('mouseenter', () => {
+    state.hoveredIndex = idx;
+    layoutCards(container);
+  });
+  el.addEventListener('mouseleave', () => {
+    state.hoveredIndex = -1;
+    layoutCards(container);
+  });
+
+  el.querySelector('.node-card').addEventListener('click', e => {
+    e.stopPropagation();
+    if (state.transitioning) return;
+
+    if (node.type === 'folder') {
+      // 计算点击卡片相对于容器中心的 X 偏移
+      const containerRect = container.getBoundingClientRect();
+      const cardRect = el.getBoundingClientRect();
+      const clickOriginX = (cardRect.left + cardRect.width / 2)
+        - (containerRect.left + containerRect.width / 2);
+      navigateInto(node, clickOriginX);
+    } else {
+      openFileModal(node);
+    }
+  });
+}
+
+// ========== 轮播布局计算 ==========
+
+function layoutCards(container) {
+  const cards = container.querySelectorAll(':scope > .node');
+  const count = cards.length;
+  if (count === 0) return;
+
+  const centerIdx = state.centerIndex;
+  const containerW = container.clientWidth || 1200;
+  const cardW = 240;
+
+  // 动态间距：卡片少时宽松，多时紧凑
+  const idealSpacing = Math.min(260, Math.max(140, (containerW * 0.7) / Math.max(count, 2)));
+  const spacing = idealSpacing;
+  const scaleStep = 0.09;
   const zBase = 100;
 
-  nodeEls.forEach((el, i) => {
-    let offset = i - centerIdx;
+  cards.forEach((el, i) => {
+    const offset = i - centerIdx;
 
-    // 悬停时，被悬停的卡片向中心移动
+    // 悬停偏移：向中心靠拢
     let hoverShift = 0;
-    if (state.hoveredIndex >= 0 && i === state.hoveredIndex) {
-      const hoverOffset = state.hoveredIndex - centerIdx;
-      hoverShift = -hoverOffset * 40; // 向中心移动40px
+    if (state.hoveredIndex === i && offset !== 0) {
+      hoverShift = -offset * 35;
     }
 
     const x = offset * spacing + hoverShift;
     const dist = Math.abs(offset);
-    const scale = Math.max(0.65, 1 - dist * scaleStep);
-    const zIndex = zBase - dist;
-    const opacity = Math.max(0.4, 1 - dist * 0.15);
+    const scale = Math.max(0.58, 1 - dist * scaleStep);
+    const zIndex = zBase - dist * 10 + (state.hoveredIndex === i ? 20 : 0);
+    const opacity = Math.max(0.3, 1 - dist * 0.2);
 
     el.style.transform = `translateX(${x}px) scale(${scale})`;
     el.style.zIndex = zIndex;
@@ -118,7 +192,195 @@ function layoutCarousel(container, count, centerIdx) {
   });
 }
 
-// 创建单个卡片元素
+// ========== 导航：进入文件夹 ==========
+
+function navigateInto(folder, originX) {
+  if (state.transitioning) return;
+  state.transitioning = true;
+
+  const container = treeRootEl;
+  const oldCards = [...container.querySelectorAll(':scope > .node')];
+
+  // 入栈
+  state.navStack.push({
+    nodes: state.currentNodes,
+    centerIndex: state.centerIndex,
+    folderTitle: folder.title
+  });
+
+  // 更新当前节点
+  state.currentNodes = folder.children || [];
+
+  // 先创建新卡片（在旧卡片上方），从 originX 出发
+  const newCards = [];
+  state.currentNodes.forEach((node, i) => {
+    const el = createCardElement(node);
+    el.dataset.idx = i;
+    el.style.transition = 'none';
+    el.style.transform = `translateX(${originX}px) scale(0.3)`;
+    el.style.opacity = '0';
+    el.style.zIndex = 200;
+    container.appendChild(el);
+    bindCardEvents(el, node, i, container);
+    newCards.push(el);
+  });
+
+  // 同时：旧卡片缩小淡出
+  oldCards.forEach(el => {
+    el.style.pointerEvents = 'none';
+    el.style.opacity = '0';
+    el.style.transform = el.style.transform.replace(/scale\([^)]*\)/, 'scale(0.65)');
+  });
+
+  // 下一帧：新卡片展开到位
+  requestAnimationFrame(() => {
+    newCards.forEach(el => { el.style.transition = ''; });
+    state.centerIndex = Math.floor(state.currentNodes.length / 2);
+    state.hoveredIndex = -1;
+
+    requestAnimationFrame(() => {
+      layoutCards(container);
+
+      // 动画结束后清理
+      setTimeout(() => {
+        oldCards.forEach(el => el.remove());
+        // 恢复 z-index
+        newCards.forEach(el => { el.style.zIndex = ''; });
+        layoutCards(container);
+        state.transitioning = false;
+      }, 520);
+    });
+  });
+
+  renderBreadcrumb();
+}
+
+// ========== 导航：返回上一级 ==========
+
+function navigateBack() {
+  if (state.navStack.length === 0 || state.transitioning) return;
+  state.transitioning = true;
+
+  const prev = state.navStack.pop();
+  const container = treeRootEl;
+  const oldCards = [...container.querySelectorAll(':scope > .node')];
+
+  state.currentNodes = prev.nodes;
+
+  // 旧卡片（当前层）收缩回中心
+  oldCards.forEach(el => {
+    el.style.pointerEvents = 'none';
+    el.style.transform = 'translateX(0px) scale(0.3)';
+    el.style.opacity = '0';
+  });
+
+  // 创建父层卡片，初始状态为放大的背景
+  const newCards = [];
+  state.currentNodes.forEach((node, i) => {
+    const el = createCardElement(node);
+    el.dataset.idx = i;
+    el.style.transition = 'none';
+    el.style.transform = 'translateX(0px) scale(1.15)';
+    el.style.opacity = '0';
+    el.style.zIndex = -1;
+    container.appendChild(el);
+    bindCardEvents(el, node, i, container);
+    newCards.push(el);
+  });
+
+  requestAnimationFrame(() => {
+    newCards.forEach(el => { el.style.transition = ''; });
+    state.centerIndex = prev.centerIndex;
+    state.hoveredIndex = -1;
+
+    requestAnimationFrame(() => {
+      layoutCards(container);
+
+      setTimeout(() => {
+        oldCards.forEach(el => el.remove());
+        newCards.forEach(el => { el.style.zIndex = ''; });
+        layoutCards(container);
+        state.transitioning = false;
+      }, 520);
+    });
+  });
+
+  renderBreadcrumb();
+}
+
+// 跳转到指定层级
+function navigateToLevel(targetLevel) {
+  if (state.transitioning) return;
+  if (targetLevel >= state.navStack.length) return;
+
+  // 取出目标层
+  const target = state.navStack[targetLevel];
+  state.navStack.length = targetLevel;
+
+  state.transitioning = true;
+  const container = treeRootEl;
+  const oldCards = [...container.querySelectorAll(':scope > .node')];
+  state.currentNodes = target.nodes;
+
+  oldCards.forEach(el => {
+    el.style.pointerEvents = 'none';
+    el.style.transform = 'translateX(0px) scale(0.3)';
+    el.style.opacity = '0';
+  });
+
+  const newCards = [];
+  state.currentNodes.forEach((node, i) => {
+    const el = createCardElement(node);
+    el.dataset.idx = i;
+    el.style.transition = 'none';
+    el.style.transform = 'translateX(0px) scale(1.15)';
+    el.style.opacity = '0';
+    container.appendChild(el);
+    bindCardEvents(el, node, i, container);
+    newCards.push(el);
+  });
+
+  requestAnimationFrame(() => {
+    newCards.forEach(el => { el.style.transition = ''; });
+    state.centerIndex = target.centerIndex;
+    state.hoveredIndex = -1;
+    requestAnimationFrame(() => {
+      layoutCards(container);
+      setTimeout(() => {
+        oldCards.forEach(el => el.remove());
+        newCards.forEach(el => { el.style.zIndex = ''; });
+        layoutCards(container);
+        state.transitioning = false;
+      }, 520);
+    });
+  });
+
+  renderBreadcrumb();
+}
+
+// ========== 全局事件 ==========
+
+// 点击空白区域返回上一级
+document.addEventListener('click', e => {
+  if (state.transitioning) return;
+  // 点在卡片上、模态框上、面包屑上 → 不处理
+  if (e.target.closest('.node-card') || e.target.closest('.modal') || e.target.closest('.breadcrumb')) return;
+  if (state.navStack.length > 0) {
+    navigateBack();
+  }
+});
+
+// ESC 键返回
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    const modal = document.getElementById('file-modal');
+    if (modal) return; // 模态框优先
+    if (state.navStack.length > 0) navigateBack();
+  }
+});
+
+// ========== 创建卡片 ==========
+
 function createCardElement(node) {
   const nodeEl = document.createElement('div');
   nodeEl.className = 'node';
@@ -143,12 +405,13 @@ function createCardElement(node) {
   return nodeEl;
 }
 
-// 创建文件夹视觉 —— 整体绘制为文件夹造型
+// ========== 文件夹视觉：整体文件夹造型 + 堆叠图像 ==========
+
 function createFolderVisual(node) {
   const wrap = document.createElement('div');
   wrap.className = 'folder-card-wrap';
 
-  // 文件夹耳朵（标签页）
+  // 文件夹耳朵
   const tab = document.createElement('div');
   tab.className = 'folder-tab';
   wrap.appendChild(tab);
@@ -157,29 +420,30 @@ function createFolderVisual(node) {
   const body = document.createElement('div');
   body.className = 'folder-body';
 
-  const hasImages = node.images && node.images.length > 0;
+  // 收集直系子节点中的图像（不递归深层）
+  const directImages = collectDirectImages(node);
+  const coverImg = getFolderCover(node, directImages);
 
-  if (hasImages) {
+  if (directImages.length > 0) {
     const stackEl = document.createElement('div');
     stackEl.className = 'image-stack';
 
-    if (node.coverImage) {
+    // 封面图放最上层
+    if (coverImg) {
       const img = document.createElement('img');
       img.className = 'stack-layer cover';
-      img.src = node.coverImage;
+      img.src = coverImg;
       img.alt = node.title;
       img.loading = 'lazy';
       stackEl.appendChild(img);
     }
 
-    const otherImages = node.images
-      .filter(img => img !== node.coverImage)
-      .slice(0, 4);
-
-    otherImages.forEach(imgSrc => {
+    // 其他图像（去重，最多4张）
+    const others = directImages.filter(s => s !== coverImg).slice(0, 4);
+    others.forEach(src => {
       const img = document.createElement('img');
       img.className = 'stack-layer';
-      img.src = imgSrc;
+      img.src = src;
       img.alt = '';
       img.loading = 'lazy';
       stackEl.appendChild(img);
@@ -187,27 +451,52 @@ function createFolderVisual(node) {
 
     body.appendChild(stackEl);
   } else {
-    const placeholderEl = document.createElement('div');
-    placeholderEl.className = 'placeholder-bg';
-
-    // 简约的文档线条图标
-    const iconInner = document.createElement('div');
-    iconInner.className = 'folder-icon-inner';
+    // 无图像：占位
+    const ph = document.createElement('div');
+    ph.className = 'placeholder-bg';
+    const icon = document.createElement('div');
+    icon.className = 'folder-icon-inner';
     for (let i = 0; i < 3; i++) {
       const line = document.createElement('div');
       line.className = 'line';
-      iconInner.appendChild(line);
+      icon.appendChild(line);
     }
-    placeholderEl.appendChild(iconInner);
-
-    body.appendChild(placeholderEl);
+    ph.appendChild(icon);
+    body.appendChild(ph);
   }
 
   wrap.appendChild(body);
   return wrap;
 }
 
-// 创建笔记视觉元素
+// 收集直系子节点中的图像（只查直系 note 子节点，不递归）
+function collectDirectImages(folder) {
+  const imgs = [];
+  if (!folder.children) return imgs;
+  folder.children.forEach(child => {
+    if (child.type === 'note' && child.images && child.images.length > 0) {
+      imgs.push(...child.images);
+    }
+  });
+  return imgs;
+}
+
+// 获取封面图：优先从名为"封面"的直系 md 子节点取
+function getFolderCover(folder, directImages) {
+  if (folder.children) {
+    const coverNote = folder.children.find(
+      c => c.type === 'note' && c.title === '封面'
+    );
+    if (coverNote && coverNote.images && coverNote.images.length > 0) {
+      return coverNote.images[0];
+    }
+  }
+  // 回退：manifest 中的 coverImage 或第一张直系图
+  return folder.coverImage || directImages[0] || null;
+}
+
+// ========== 笔记卡片视觉 ==========
+
 function createNoteVisual(node) {
   const visualEl = document.createElement('div');
   visualEl.className = 'note-visual';
@@ -229,104 +518,9 @@ function createNoteVisual(node) {
   return visualEl;
 }
 
-// ========== 节点点击 ==========
-
-function handleNodeClick(node) {
-  if (node.type === 'folder') {
-    openFolderOverlay(node);
-  } else {
-    openFileModal(node);
-  }
-}
-
-// ========== 文件夹展开 —— overlay 模式 ==========
-
-function openFolderOverlay(node) {
-  // 如果已经有展开的 overlay，先关闭
-  if (state.expandedOverlay) {
-    closeFolderOverlay();
-    // 如果点的是同一个文件夹，直接关闭
-    if (state.expandedNodeId === node.id) return;
-  }
-
-  state.expandedNodeId = node.id;
-
-  const overlay = document.createElement('div');
-  overlay.className = 'children-overlay';
-
-  // 标题
-  const title = document.createElement('div');
-  title.className = 'overlay-title';
-  title.textContent = node.title;
-  overlay.appendChild(title);
-
-  // 关闭按钮
-  const closeBtn = document.createElement('button');
-  closeBtn.className = 'overlay-close';
-  closeBtn.textContent = '✕';
-  closeBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    closeFolderOverlay();
-  });
-  overlay.appendChild(closeBtn);
-
-  // 内部轮播容器
-  const inner = document.createElement('div');
-  inner.className = 'carousel-inner';
-  overlay.appendChild(inner);
-
-  document.body.appendChild(overlay);
-  state.expandedOverlay = overlay;
-
-  // 点击 overlay 背景关闭
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) {
-      closeFolderOverlay();
-    }
-  });
-
-  // ESC 关闭
-  state._overlayEscHandler = (e) => {
-    if (e.key === 'Escape') closeFolderOverlay();
-  };
-  document.addEventListener('keydown', state._overlayEscHandler);
-
-  // 入场动画
-  requestAnimationFrame(() => {
-    overlay.classList.add('visible');
-  });
-
-  // 渲染子节点轮播
-  if (node.children && node.children.length > 0) {
-    const childCenter = Math.floor(node.children.length / 2);
-    renderCarousel(inner, node.children, childCenter);
-  } else {
-    inner.innerHTML = '<div class="empty">该文件夹为空</div>';
-  }
-}
-
-function closeFolderOverlay() {
-  if (!state.expandedOverlay) return;
-
-  const overlay = state.expandedOverlay;
-  overlay.classList.remove('visible');
-
-  if (state._overlayEscHandler) {
-    document.removeEventListener('keydown', state._overlayEscHandler);
-    state._overlayEscHandler = null;
-  }
-
-  setTimeout(() => overlay.remove(), 400);
-  state.expandedOverlay = null;
-  state.expandedNodeId = null;
-}
-
-// ========== 文件模态框 ==========
+// ========== 文件模态框（仅用于查看文件内容） ==========
 
 function openFileModal(node) {
-  // 如果有 overlay 展开，先关闭
-  // （不关闭，因为文件可能在 overlay 中打开）
-
   state.activeFile = node.id;
 
   const modal = document.createElement('div');
@@ -342,10 +536,7 @@ function openFileModal(node) {
   `;
 
   document.body.appendChild(modal);
-
-  requestAnimationFrame(() => {
-    modal.classList.add('visible');
-  });
+  requestAnimationFrame(() => modal.classList.add('visible'));
 
   const closeModal = () => {
     modal.classList.remove('visible');
@@ -356,7 +547,7 @@ function openFileModal(node) {
   modal.querySelector('.modal-close').addEventListener('click', closeModal);
   modal.querySelector('.modal-backdrop').addEventListener('click', closeModal);
 
-  const handleEsc = (e) => {
+  const handleEsc = e => {
     if (e.key === 'Escape') {
       closeModal();
       document.removeEventListener('keydown', handleEsc);
@@ -365,16 +556,8 @@ function openFileModal(node) {
   document.addEventListener('keydown', handleEsc);
 }
 
-// ========== 全局点击：关闭展开 ==========
+// ========== 工具函数 ==========
 
-document.addEventListener('click', (e) => {
-  // 如果点击了空白区域（非卡片、非 overlay 内部），关闭 overlay
-  if (state.expandedOverlay && !e.target.closest('.children-overlay') && !e.target.closest('.modal')) {
-    closeFolderOverlay();
-  }
-});
-
-// 在树中查找节点
 function findNodeById(tree, id) {
   if (tree.id === id) return tree;
   if (tree.children) {
@@ -386,7 +569,6 @@ function findNodeById(tree, id) {
   return null;
 }
 
-// HTML 转义
 function escapeHtml(text) {
   return String(text)
     .replaceAll("&", "&amp;")
