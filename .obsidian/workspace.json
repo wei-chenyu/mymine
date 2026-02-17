@@ -11,14 +11,12 @@
             "id": "92c0ac730be54bf8",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "image",
               "state": {
-                "file": "profile.md",
-                "mode": "source",
-                "source": false
+                "file": "content/一级3/二级3/s.jpg"
               },
-              "icon": "lucide-file",
-              "title": "profile"
+              "icon": "lucide-image",
+              "title": "s"
             }
           }
         ]
@@ -94,7 +92,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "profile.md",
+                "file": "content/一级3/二级3/s.jpg",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +102,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "profile 的反向链接列表"
+              "title": "s 的反向链接列表"
             }
           },
           {
@@ -113,12 +111,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "profile.md",
+                "file": "content/一级3/二级3/s.jpg",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "profile 的出链列表"
+              "title": "s 的出链列表"
             }
           },
           {
@@ -156,13 +154,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "profile.md",
+                "file": "content/一级3/二级3/s.jpg",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "profile 的大纲"
+              "title": "s 的大纲"
             }
           }
         ]
@@ -185,6 +183,21 @@
   },
   "active": "92c0ac730be54bf8",
   "lastOpenFiles": [
+    "index.html.tmp.5248.1771291904125",
+    "index.html.tmp.5248.1771291899871",
+    "assets/js/main.js.tmp.5248.1771291894219",
+    "assets/css/style.css.tmp.5248.1771291822367",
+    "content/一级3/二级3/未命名.md",
+    "content/一级3/二级3/s.jpg",
+    "content/一级3/vc.md",
+    "content/一级3/e.jpg",
+    "content/一级2/？.md",
+    "content/一级2/陵湍.png",
+    "content/一级1/二级文件 1.md",
+    "content/一级1/一级文件.md",
+    "content/一级1/二级1/二级文件.md",
+    "content/一级1/二级1/白旬.jpg",
+    "profile.md",
     "index.html.tmp.6520.1771290442560",
     "assets/css/style.css.tmp.6520.1771290428030",
     "assets/js/main.js.tmp.6520.1771290350137",
@@ -192,19 +205,11 @@
     "index.html.tmp.6520.1771290296857",
     "scripts/build-manifest.js.tmp.6520.1771290252678",
     "scripts/build-manifest.js.tmp.6520.1771290243611",
-    "node_modules/gray-matter/gray-matter.d.ts",
-    "content/一级1/一级文件.md",
-    "profile.md",
-    "scripts/build-manifest.js",
-    "index.html",
-    "assets/js/main.js",
     "avatar/profile.jpg",
     "assets/img/profile.jpg",
     "assets/img/R[@7$W}R2WD(M5VRDSY(~PS.png",
     "assets/profile.jpg",
     "assets/profle.jpg",
-    "content/一级1/二级1/二级文件.md",
-    "content/一级1/二级1/白旬.jpg",
     "assets/img/avatar-fallback.svg",
     "node_modules/marked/README.md",
     "node_modules/marked/man/marked.1.md",

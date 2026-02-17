@@ -11,8 +11,13 @@ if (avatarEl) {
 
 const state = {
   tree: {},
-  expandedNodes: new Set(),
-  activeFile: null
+  activeFile: null,
+  // 轮播状态
+  centerIndex: 0,
+  hoveredIndex: -1,
+  currentNodes: [],       // 当前显示的顶层节点列表
+  expandedOverlay: null,  // 当前展开的 overlay DOM
+  expandedNodeId: null    // 当前展开的文件夹 id
 };
 
 // 初始化：加载 manifest
@@ -27,7 +32,9 @@ fetch("assets/data/manifest.json", { cache: "no-cache" })
     }
 
     state.tree = tree;
-    renderTree();
+    state.currentNodes = tree.children;
+    state.centerIndex = Math.floor(tree.children.length / 2);
+    renderCarousel(treeRootEl, state.currentNodes, state.centerIndex);
   })
   .catch((err) => {
     renderEmpty("加载失败");
@@ -45,33 +52,78 @@ function renderEmpty(text) {
   treeRootEl.innerHTML = `<div class="empty">${escapeHtml(text)}</div>`;
 }
 
-// 渲染整个树
-function renderTree() {
-  treeRootEl.innerHTML = '';
+// ========== 轮播渲染 ==========
 
-  if (!state.tree.children || state.tree.children.length === 0) {
+function renderCarousel(container, nodes, centerIdx) {
+  container.innerHTML = '';
+  if (!nodes || nodes.length === 0) {
     renderEmpty("该目录为空。");
     return;
   }
 
-  state.tree.children.forEach((node, index) => {
-    const nodeEl = createNodeElement(node, 0, index);
-    treeRootEl.appendChild(nodeEl);
+  const count = nodes.length;
+
+  nodes.forEach((node, i) => {
+    const nodeEl = createCardElement(node);
+    nodeEl.dataset.carouselIndex = i;
+    container.appendChild(nodeEl);
+
+    // 悬停：向中间聚拢
+    nodeEl.addEventListener('mouseenter', () => {
+      state.hoveredIndex = i;
+      layoutCarousel(container, count, centerIdx);
+    });
+
+    nodeEl.addEventListener('mouseleave', () => {
+      state.hoveredIndex = -1;
+      layoutCarousel(container, count, centerIdx);
+    });
+
+    // 点击
+    nodeEl.querySelector('.node-card').addEventListener('click', (e) => {
+      e.stopPropagation();
+      handleNodeClick(node);
+    });
+  });
+
+  layoutCarousel(container, count, centerIdx);
+}
+
+// 计算轮播布局位置
+function layoutCarousel(container, count, centerIdx) {
+  const nodeEls = container.querySelectorAll(':scope > .node');
+  const spacing = 200; // 每张卡片间距（px）
+  const scaleStep = 0.1; // 每远离中心缩小的比例
+  const zBase = 100;
+
+  nodeEls.forEach((el, i) => {
+    let offset = i - centerIdx;
+
+    // 悬停时，被悬停的卡片向中心移动
+    let hoverShift = 0;
+    if (state.hoveredIndex >= 0 && i === state.hoveredIndex) {
+      const hoverOffset = state.hoveredIndex - centerIdx;
+      hoverShift = -hoverOffset * 40; // 向中心移动40px
+    }
+
+    const x = offset * spacing + hoverShift;
+    const dist = Math.abs(offset);
+    const scale = Math.max(0.65, 1 - dist * scaleStep);
+    const zIndex = zBase - dist;
+    const opacity = Math.max(0.4, 1 - dist * 0.15);
+
+    el.style.transform = `translateX(${x}px) scale(${scale})`;
+    el.style.zIndex = zIndex;
+    el.style.opacity = opacity;
   });
 }
 
-// 创建节点元素
-function createNodeElement(node, depth, index) {
+// 创建单个卡片元素
+function createCardElement(node) {
   const nodeEl = document.createElement('div');
   nodeEl.className = 'node';
-  nodeEl.id = `node-${node.id}`;
   nodeEl.dataset.type = node.type;
-  nodeEl.dataset.depth = depth;
 
-  const isExpanded = state.expandedNodes.has(node.id);
-  if (isExpanded) nodeEl.classList.add('expanded');
-
-  // 创建卡片
   const cardEl = document.createElement('div');
   cardEl.className = 'node-card';
 
@@ -81,46 +133,36 @@ function createNodeElement(node, depth, index) {
     cardEl.appendChild(createNoteVisual(node));
   }
 
-  // 添加标题
+  // 标题
   const titleEl = document.createElement('div');
   titleEl.className = 'node-title';
   titleEl.textContent = node.title;
   cardEl.appendChild(titleEl);
 
   nodeEl.appendChild(cardEl);
-
-  // 点击事件
-  cardEl.addEventListener('click', (e) => {
-    e.stopPropagation();
-    handleNodeClick(node);
-  });
-
-  // 如果是文件夹，创建子容器
-  if (node.type === 'folder') {
-    const childContainer = document.createElement('div');
-    childContainer.className = 'children-container';
-
-    if (isExpanded && node.children) {
-      node.children.forEach((child, idx) => {
-        childContainer.appendChild(createNodeElement(child, depth + 1, idx));
-      });
-    }
-
-    nodeEl.appendChild(childContainer);
-  }
-
   return nodeEl;
 }
 
-// 创建文件夹视觉元素
+// 创建文件夹视觉 —— 整体绘制为文件夹造型
 function createFolderVisual(node) {
-  const stackEl = document.createElement('div');
-  stackEl.className = 'image-stack';
+  const wrap = document.createElement('div');
+  wrap.className = 'folder-card-wrap';
+
+  // 文件夹耳朵（标签页）
+  const tab = document.createElement('div');
+  tab.className = 'folder-tab';
+  wrap.appendChild(tab);
+
+  // 文件夹主体
+  const body = document.createElement('div');
+  body.className = 'folder-body';
 
   const hasImages = node.images && node.images.length > 0;
 
   if (hasImages) {
-    // 封面图放最上层
+    const stackEl = document.createElement('div');
+    stackEl.className = 'image-stack';
+
     if (node.coverImage) {
       const img = document.createElement('img');
       img.className = 'stack-layer cover';
@@ -130,7 +172,6 @@ function createFolderVisual(node) {
       stackEl.appendChild(img);
     }
 
-    // 其他图像（最多4张）
     const otherImages = node.images
       .filter(img => img !== node.coverImage)
       .slice(0, 4);
@@ -143,20 +184,27 @@ function createFolderVisual(node) {
       img.loading = 'lazy';
       stackEl.appendChild(img);
     });
+
+    body.appendChild(stackEl);
   } else {
-    // 如果没有图像，使用渐变背景
     const placeholderEl = document.createElement('div');
     placeholderEl.className = 'placeholder-bg';
-    stackEl.appendChild(placeholderEl);
+
+    // 简约的文档线条图标
+    const iconInner = document.createElement('div');
+    iconInner.className = 'folder-icon-inner';
+    for (let i = 0; i < 3; i++) {
+      const line = document.createElement('div');
+      line.className = 'line';
+      iconInner.appendChild(line);
+    }
+    placeholderEl.appendChild(iconInner);
+
+    body.appendChild(placeholderEl);
   }
 
-  // 文件夹角标
-  const badge = document.createElement('div');
-  badge.className = 'folder-badge';
-  badge.textContent = '夹';
-  stackEl.appendChild(badge);
-
-  return stackEl;
+  wrap.appendChild(body);
+  return wrap;
 }
 
 // 创建笔记视觉元素
@@ -165,7 +213,6 @@ function createNoteVisual(node) {
   visualEl.className = 'note-visual';
 
   if (node.images && node.images.length > 0) {
-    // 有图像：显示第一张
     const img = document.createElement('img');
     img.className = 'note-image';
     img.src = node.images[0];
@@ -173,7 +220,6 @@ function createNoteVisual(node) {
     img.loading = 'lazy';
     visualEl.appendChild(img);
   } else {
-    // 无图像：渲染文字内容
     const textEl = document.createElement('div');
     textEl.className = 'note-text';
     textEl.innerHTML = node.html || `<p>${escapeHtml(node.textContent || '空文档')}</p>`;
@@ -183,70 +229,104 @@ function createNoteVisual(node) {
   return visualEl;
 }
 
-// 处理节点点击
+// ========== 节点点击 ==========
+
 function handleNodeClick(node) {
   if (node.type === 'folder') {
-    toggleExpand(node.id);
+    openFolderOverlay(node);
   } else {
     openFileModal(node);
   }
 }
 
-// 切换展开/折叠
-function toggleExpand(nodeId) {
-  const nodeEl = document.getElementById(`node-${nodeId}`);
-  if (!nodeEl) return;
+// ========== 文件夹展开 —— overlay 模式 ==========
 
-  if (state.expandedNodes.has(nodeId)) {
-    // 折叠
-    state.expandedNodes.delete(nodeId);
-    nodeEl.classList.remove('expanded');
+function openFolderOverlay(node) {
+  // 如果已经有展开的 overlay，先关闭
+  if (state.expandedOverlay) {
+    closeFolderOverlay();
+    // 如果点的是同一个文件夹，直接关闭
+    if (state.expandedNodeId === node.id) return;
+  }
 
-    const childContainer = nodeEl.querySelector('.children-container');
-    if (childContainer) {
-      childContainer.classList.add('collapsing');
+  state.expandedNodeId = node.id;
 
-      setTimeout(() => {
-        childContainer.innerHTML = '';
-        childContainer.classList.remove('collapsing');
-      }, 400);
+  const overlay = document.createElement('div');
+  overlay.className = 'children-overlay';
+
+  // 标题
+  const title = document.createElement('div');
+  title.className = 'overlay-title';
+  title.textContent = node.title;
+  overlay.appendChild(title);
+
+  // 关闭按钮
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'overlay-close';
+  closeBtn.textContent = '✕';
+  closeBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeFolderOverlay();
+  });
+  overlay.appendChild(closeBtn);
+
+  // 内部轮播容器
+  const inner = document.createElement('div');
+  inner.className = 'carousel-inner';
+  overlay.appendChild(inner);
+
+  document.body.appendChild(overlay);
+  state.expandedOverlay = overlay;
+
+  // 点击 overlay 背景关闭
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) {
+      closeFolderOverlay();
     }
+  });
+
+  // ESC 关闭
+  state._overlayEscHandler = (e) => {
+    if (e.key === 'Escape') closeFolderOverlay();
+  };
+  document.addEventListener('keydown', state._overlayEscHandler);
+
+  // 入场动画
+  requestAnimationFrame(() => {
+    overlay.classList.add('visible');
+  });
+
+  // 渲染子节点轮播
+  if (node.children && node.children.length > 0) {
+    const childCenter = Math.floor(node.children.length / 2);
+    renderCarousel(inner, node.children, childCenter);
   } else {
-    // 展开
-    state.expandedNodes.add(nodeId);
-    nodeEl.classList.add('expanded');
-
-    const node = findNodeById(state.tree, nodeId);
-    const childContainer = nodeEl.querySelector('.children-container');
-
-    if (node && node.children && childContainer) {
-      const depth = parseInt(nodeEl.dataset.depth) + 1;
-      node.children.forEach((child, idx) => {
-        const childEl = createNodeElement(child, depth, idx);
-        childEl.classList.add('expanding');
-        childContainer.appendChild(childEl);
-
-        // 错开移除动画类
-        setTimeout(() => childEl.classList.remove('expanding'), 50 * idx + 400);
-      });
-    }
+    inner.innerHTML = '<div class="empty">该文件夹为空</div>';
   }
 }
 
-// 在树中查找节点
-function findNodeById(tree, id) {
-  if (tree.id === id) return tree;
-  if (tree.children) {
-    for (const child of tree.children) {
-      const found = findNodeById(child, id);
-      if (found) return found;
-    }
+function closeFolderOverlay() {
+  if (!state.expandedOverlay) return;
+
+  const overlay = state.expandedOverlay;
+  overlay.classList.remove('visible');
+
+  if (state._overlayEscHandler) {
+    document.removeEventListener('keydown', state._overlayEscHandler);
+    state._overlayEscHandler = null;
   }
-  return null;
+
+  setTimeout(() => overlay.remove(), 400);
+  state.expandedOverlay = null;
+  state.expandedNodeId = null;
 }
 
-// 打开文件模态框
+// ========== 文件模态框 ==========
+
 function openFileModal(node) {
+  // 如果有 overlay 展开，先关闭
+  // （不关闭，因为文件可能在 overlay 中打开）
+
   state.activeFile = node.id;
 
   const modal = document.createElement('div');
@@ -263,12 +343,10 @@ function openFileModal(node) {
 
   document.body.appendChild(modal);
 
-  // 动画入场
   requestAnimationFrame(() => {
     modal.classList.add('visible');
   });
 
-  // 关闭事件
   const closeModal = () => {
     modal.classList.remove('visible');
     setTimeout(() => modal.remove(), 300);
@@ -278,7 +356,6 @@ function openFileModal(node) {
   modal.querySelector('.modal-close').addEventListener('click', closeModal);
   modal.querySelector('.modal-backdrop').addEventListener('click', closeModal);
 
-  // ESC 键关闭
   const handleEsc = (e) => {
     if (e.key === 'Escape') {
       closeModal();
@@ -286,6 +363,27 @@ function openFileModal(node) {
     }
   };
   document.addEventListener('keydown', handleEsc);
+}
+
+// ========== 全局点击：关闭展开 ==========
+
+document.addEventListener('click', (e) => {
+  // 如果点击了空白区域（非卡片、非 overlay 内部），关闭 overlay
+  if (state.expandedOverlay && !e.target.closest('.children-overlay') && !e.target.closest('.modal')) {
+    closeFolderOverlay();
+  }
+});
+
+// 在树中查找节点
+function findNodeById(tree, id) {
+  if (tree.id === id) return tree;
+  if (tree.children) {
+    for (const child of tree.children) {
+      const found = findNodeById(child, id);
+      if (found) return found;
+    }
+  }
+  return null;
 }
 
 // HTML 转义
