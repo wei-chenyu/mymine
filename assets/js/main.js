@@ -473,25 +473,51 @@ function openFileModal(node) {
   document.body.appendChild(modal);
   requestAnimationFrame(() => modal.classList.add('visible'));
 
+  replaceRelatedLabel(modal);
+
+  let handleEsc = null;
   const closeModal = () => {
     modal.classList.remove('visible');
     setTimeout(() => modal.remove(), 300);
     state.activeFile = null;
+    if (handleEsc) document.removeEventListener('keydown', handleEsc);
   };
 
   modal.querySelector('.modal-close').addEventListener('click', closeModal);
   modal.querySelector('.modal-backdrop').addEventListener('click', closeModal);
+  modal.querySelector('.modal-content').addEventListener('click', e => {
+    const t = e.target;
+    if (!(t instanceof Element)) return;
+    if (t.closest('.modal-close, a, button, img, video, iframe, input, textarea, select, summary, details, pre, code')) return;
+    if (t.closest('p, h1, h2, h3, h4, h5, h6, li, blockquote, table, figcaption')) return;
+    closeModal();
+  });
 
-  const handleEsc = e => {
+  handleEsc = e => {
     if (e.key === 'Escape') {
       closeModal();
-      document.removeEventListener('keydown', handleEsc);
     }
   };
   document.addEventListener('keydown', handleEsc);
 }
 
 // ========== 工具 ==========
+
+function replaceRelatedLabel(root) {
+  if (!root) return;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const textNodes = [];
+  let n = walker.nextNode();
+  while (n) {
+    textNodes.push(n);
+    n = walker.nextNode();
+  }
+  textNodes.forEach(node => {
+    if (node.nodeValue && node.nodeValue.includes('相关作品')) {
+      node.nodeValue = node.nodeValue.replaceAll('相关作品', '相关');
+    }
+  });
+}
 
 function escapeHtml(text) {
   return String(text)
