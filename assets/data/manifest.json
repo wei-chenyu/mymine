@@ -12,6 +12,17 @@
       "title": "一级1",
       "children": [
         {
+          "id": "一级1/串门.md",
+          "type": "note",
+          "title": "串门",
+          "summary": "",
+          "html": "<p><img src=\"e.jpg\" alt=\"e.jpg\"></p>\n",
+          "images": [
+            "e.jpg"
+          ],
+          "textContent": "![[e.jpg]]"
+        },
+        {
           "id": "一级1/二级1",
           "type": "folder",
           "title": "二级1",
@@ -21,16 +32,12 @@
               "type": "note",
               "title": "二级文件",
               "summary": "",
-              "html": "<p><img src=\"%E7%99%BD%E6%97%AC.jpg\" alt=\"白旬.jpg\"></p>\n",
-              "images": [
-                "%E7%99%BD%E6%97%AC.jpg"
-              ],
-              "textContent": "![[白旬.jpg]]"
+              "html": "<p>说两句</p>\n<p>首先，我是天下第一帅</p>\n<p>其次，额</p>\n",
+              "images": [],
+              "textContent": "说两句\n\n首先，我是天下第一帅\n\n其次，额"
             }
           ],
-          "images": [
-            "%E7%99%BD%E6%97%AC.jpg"
-          ],
+          "images": [],
           "coverImage": null
         },
         {
@@ -38,15 +45,18 @@
           "type": "note",
           "title": "二级文件 1",
           "summary": "",
-          "html": "<p><img src=\"content/%E4%B8%80%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg\" alt=\"白旬.jpg\"></p>\n",
+          "html": "<p><img src=\"content/%E4%B8%80%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg\" alt=\"白旬.jpg\">\n这是分割\n<img src=\"%E9%99%B5%E6%B9%8D.png\" alt=\"陵湍.png\"></p>\n",
           "images": [
-            "content/%E4%B8%80%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg"
+            "content/%E4%B8%80%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg",
+            "%E9%99%B5%E6%B9%8D.png"
           ],
-          "textContent": "![[白旬.jpg]]"
+          "textContent": "![[白旬.jpg]]\n这是分割\n![[陵湍.png]]"
         }
       ],
       "images": [
-        "content/%E4%B8%80%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg"
+        "e.jpg",
+        "content/%E4%B8%80%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg",
+        "%E9%99%B5%E6%B9%8D.png"
       ],
       "coverImage": null
     },

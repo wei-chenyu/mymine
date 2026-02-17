@@ -9,10 +9,14 @@ if (avatarEl) {
 
 const HOVER_DELAY = 520; // 悬停多久后才旋转（毫秒）
 const HOVER_COOLDOWN = 420; // 切换后冷却周期，避免过快连续跳转
+const SWIPE_THRESHOLD = 48;
 let hoverTimer = null;
 
 const state = {
   tree: {},
+  nodeById: new Map(),
+  parentById: new Map(),
+  nodeByPublicMdPath: new Map(),
   // 层级栈：每层 { nodes, expandedIndex, focusIndex }
   levels: [],
   transitioning: false,
@@ -32,12 +36,14 @@ fetch("assets/data/manifest.json", { cache: "no-cache" })
       return;
     }
     state.tree = tree;
+    buildIndexes(tree);
     state.levels = [{
       nodes: tree.children,
       expandedIndex: null,
       focusIndex: Math.floor(tree.children.length / 2)
     }];
     initCards();
+    setupSwipeNavigation();
   })
   .catch(err => {
     renderEmpty("加载失败");
@@ -51,6 +57,70 @@ function renderProfile(profile) {
 
 function renderEmpty(text) {
   treeRootEl.innerHTML = `<div class="empty">${escapeHtml(text)}</div>`;
+}
+
+function buildIndexes(tree) {
+  state.nodeById.clear();
+  state.parentById.clear();
+  state.nodeByPublicMdPath.clear();
+
+  const walk = (nodes, parentId = null) => {
+    nodes.forEach(node => {
+      state.nodeById.set(node.id, node);
+      if (parentId) state.parentById.set(node.id, parentId);
+
+      if (node.type === "note") {
+        const publicPath = toPublicMdPath(node.id);
+        state.nodeByPublicMdPath.set(publicPath, node);
+        state.nodeByPublicMdPath.set(encodeURI(publicPath), node);
+      }
+
+      if (node.children && node.children.length > 0) {
+        walk(node.children, node.id);
+      }
+    });
+  };
+
+  walk(tree.children || []);
+}
+
+function setupSwipeNavigation() {
+  let startX = 0;
+  let startY = 0;
+  let tracking = false;
+
+  treeRootEl.addEventListener("touchstart", e => {
+    if (!e.touches || e.touches.length !== 1) return;
+    const t = e.touches[0];
+    startX = t.clientX;
+    startY = t.clientY;
+    tracking = true;
+  }, { passive: true });
+
+  treeRootEl.addEventListener("touchend", e => {
+    if (!tracking || !e.changedTouches || e.changedTouches.length === 0) return;
+    tracking = false;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - startX;
+    const dy = t.clientY - startY;
+    if (Math.abs(dx) < SWIPE_THRESHOLD || Math.abs(dx) < Math.abs(dy)) return;
+
+    if (dx < 0) moveActiveFocusBy(1);
+    else moveActiveFocusBy(-1);
+  }, { passive: true });
+}
+
+function moveActiveFocusBy(step) {
+  if (state.transitioning || state.levels.length === 0) return;
+  const activeLevel = state.levels[state.levels.length - 1];
+  const N = activeLevel.nodes.length;
+  if (!N) return;
+  activeLevel.focusIndex = (activeLevel.focusIndex + step + N) % N;
+  layoutAll();
+}
+
+function toPublicMdPath(nodeId) {
+  return `content/${nodeId}`.replace(/\\/g, "/");
 }
 
 // ========== 环形位置计算 ==========
@@ -465,13 +535,52 @@ function openFileModal(node) {
     <div class="modal-backdrop"></div>
     <div class="modal-content">
       <button class="modal-close">✕</button>
-      <h2>${escapeHtml(node.title)}</h2>
-      <div class="modal-body">${node.html || '<p>空文档</p>'}</div>
+      <div class="modal-layout">
+        <section class="modal-pane modal-pane-left">
+          <h2 class="modal-main-title"></h2>
+          <div class="modal-body"></div>
+        </section>
+        <aside class="modal-pane modal-pane-right">
+          <h3 class="modal-side-title"></h3>
+          <div class="modal-side-grid"></div>
+        </aside>
+      </div>
     </div>
   `;
 
   document.body.appendChild(modal);
   requestAnimationFrame(() => modal.classList.add('visible'));
+
+  const titleEl = modal.querySelector(".modal-main-title");
+  const bodyEl = modal.querySelector(".modal-body");
+  const sideTitleEl = modal.querySelector(".modal-side-title");
+  const sideGridEl = modal.querySelector(".modal-side-grid");
+
+  const renderModalNode = currentNode => {
+    state.activeFile = currentNode.id;
+    titleEl.textContent = currentNode.title || "未命名";
+    bodyEl.innerHTML = currentNode.html || "<p>空文档</p>";
+
+    const linkedEntries = getLinkedNoteEntries(currentNode);
+    const useLinked = linkedEntries.length > 0;
+    const fallbackEntries = useLinked ? [] : getSiblingEntries(currentNode);
+    const entries = useLinked ? linkedEntries : fallbackEntries;
+
+    sideTitleEl.textContent = useLinked ? "双链跳转" : "同级入口";
+    sideGridEl.innerHTML = "";
+
+    if (entries.length === 0) {
+      sideGridEl.innerHTML = `<div class="side-empty">暂无可跳转内容</div>`;
+      return;
+    }
+
+    entries.forEach(entry => {
+      const item = createSideEntryElement(entry, targetNode => renderModalNode(targetNode));
+      sideGridEl.appendChild(item);
+    });
+  };
+
+  renderModalNode(node);
 
   const closeModal = () => {
     modal.classList.remove('visible');
@@ -489,6 +598,102 @@ function openFileModal(node) {
     }
   };
   document.addEventListener('keydown', handleEsc);
+}
+
+function getLinkedNoteEntries(node) {
+  const links = extractNoteLinkTargets(node.html || "");
+  const seen = new Set();
+  const entries = [];
+
+  links.forEach(target => {
+    let decoded = target;
+    try { decoded = decodeURI(target); } catch {}
+    const hit = state.nodeByPublicMdPath.get(target) || state.nodeByPublicMdPath.get(decoded);
+    if (!hit || hit.type !== "note" || hit.id === node.id || seen.has(hit.id)) return;
+    seen.add(hit.id);
+    entries.push({ node: hit, kind: "note" });
+  });
+
+  return entries;
+}
+
+function extractNoteLinkTargets(html) {
+  const targets = [];
+  const linkRegex = /<a[^>]+href="([^"]+)"/g;
+  let match;
+  while ((match = linkRegex.exec(html)) !== null) {
+    const href = match[1].trim();
+    if (!href || href.startsWith("http://") || href.startsWith("https://") || href.startsWith("#")) continue;
+    const clean = href.split("?")[0].split("#")[0].replace(/\\/g, "/");
+    if (clean.endsWith(".md")) targets.push(clean);
+  }
+  return targets;
+}
+
+function getSiblingEntries(node) {
+  const parentId = state.parentById.get(node.id);
+  if (!parentId) return [];
+  const parent = state.nodeById.get(parentId);
+  if (!parent || !parent.children) return [];
+
+  return parent.children
+    .filter(child => child.id !== node.id)
+    .map(child => ({ node: child, kind: child.type }));
+}
+
+function createSideEntryElement(entry, onNavigate) {
+  const item = document.createElement("button");
+  item.className = "side-entry";
+  item.type = "button";
+
+  const targetNode = entry.kind === "folder" ? getFirstNoteInFolder(entry.node) : entry.node;
+  const disabled = !targetNode;
+  if (disabled) item.disabled = true;
+
+  const cover = getNodeCoverImage(entry.node);
+  if (cover) {
+    const img = document.createElement("img");
+    img.className = "side-entry-cover";
+    img.src = cover;
+    img.alt = entry.node.title || "";
+    img.loading = "lazy";
+    item.appendChild(img);
+  } else {
+    const ph = document.createElement("div");
+    ph.className = "side-entry-placeholder";
+    ph.textContent = entry.kind === "folder" ? "文件夹" : "笔记";
+    item.appendChild(ph);
+  }
+
+  const title = document.createElement("div");
+  title.className = "side-entry-title";
+  title.textContent = entry.node.title || "未命名";
+  item.appendChild(title);
+
+  if (!disabled) {
+    item.addEventListener("click", () => onNavigate(targetNode));
+  }
+
+  return item;
+}
+
+function getNodeCoverImage(node) {
+  if (!node) return null;
+  if (node.type === "note") return (node.images && node.images[0]) || null;
+  const directImages = collectDirectImages(node);
+  return getFolderCover(node, directImages);
+}
+
+function getFirstNoteInFolder(folder) {
+  if (!folder || folder.type !== "folder" || !folder.children) return null;
+  for (const child of folder.children) {
+    if (child.type === "note") return child;
+    if (child.type === "folder") {
+      const deep = getFirstNoteInFolder(child);
+      if (deep) return deep;
+    }
+  }
+  return null;
 }
 
 // ========== 工具 ==========
