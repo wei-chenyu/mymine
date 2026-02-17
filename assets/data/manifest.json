@@ -45,11 +45,11 @@
           "type": "note",
           "title": "二级文件 1",
           "summary": "",
-          "html": "<p><img src=\"content/%E4%B8%80%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg\" alt=\"白旬.jpg\">\n这是分割\n<a href=\"%E9%99%B5%E6%B9%8D.png\">陵湍.png</a></p>\n",
+          "html": "<p><img src=\"content/%E4%B8%80%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg\" alt=\"白旬.jpg\">\n这是分割\n<a href=\"%EF%BC%9F\">？</a></p>\n",
           "images": [
             "content/%E4%B8%80%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg"
           ],
-          "textContent": "![[白旬.jpg]]\n这是分割\n[[陵湍.png]]"
+          "textContent": "![[白旬.jpg]]\n这是分割\n[[？]]"
         }
       ],
       "images": [
