@@ -803,7 +803,24 @@ function pickDisplayNote(folder) {
   return null;
 }
 
-function buildDetailBodyHtml(rawHtml, heroSrc) {`r`n  if (!heroSrc) return rawHtml;`r`n`r`n  const wrap = document.createElement("div");`r`n  wrap.innerHTML = rawHtml;`r`n  const normalizedHero = normalizePath(heroSrc);`r`n  const firstMatched = [...wrap.querySelectorAll("img")]`r`n    .find(img => normalizePath(img.getAttribute("src") || "") === normalizedHero);`r`n  if (firstMatched) firstMatched.remove();`r`n  return wrap.innerHTML;`r`n}`r`n`r`nfunction updateBodyVisibility(bodyEl) {`r`n  if (!bodyEl) return;`r`n  const hasText = (bodyEl.textContent || "").trim().length > 0;`r`n  const hasMedia = bodyEl.querySelector("img,video,iframe,pre,code,blockquote,ul,ol,table");`r`n  bodyEl.classList.toggle("is-empty", !(hasText || hasMedia));`r`n}
+function buildDetailBodyHtml(rawHtml, heroSrc) {
+  if (!heroSrc) return rawHtml;
+
+  const wrap = document.createElement("div");
+  wrap.innerHTML = rawHtml;
+  const normalizedHero = normalizePath(heroSrc);
+  const firstMatched = [...wrap.querySelectorAll("img")]
+    .find(img => normalizePath(img.getAttribute("src") || "") === normalizedHero);
+  if (firstMatched) firstMatched.remove();
+  return wrap.innerHTML;
+}
+
+function updateBodyVisibility(bodyEl) {
+  if (!bodyEl) return;
+  const hasText = (bodyEl.textContent || "").trim().length > 0;
+  const hasMedia = bodyEl.querySelector("img,video,iframe,pre,code,blockquote,ul,ol,table");
+  bodyEl.classList.toggle("is-empty", !(hasText || hasMedia));
+}
 
 function syncBodyWidthToHero(modalEl) {
   const split = modalEl.querySelector(".modal-split");
