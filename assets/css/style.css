@@ -30,14 +30,14 @@ body {
   width: min(980px, 92vw);
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 156px 1fr;
+  grid-template-columns: 180px 1fr;
   gap: 18px;
   align-items: center;
 }
 
 .avatar-box {
-  width: 156px;
-  height: 156px;
+  width: 180px;
+  height: 180px;
   border-radius: 26px;
   overflow: hidden;
   border: 1px solid var(--card-border);
@@ -59,7 +59,7 @@ body {
 
 .intro h1 {
   margin: 0 0 8px;
-  font-size: clamp(30px, 5.2vw, 52px);
+  font-size: clamp(22px, 3.2vw, 36px);
   line-height: 1;
 }
 
@@ -79,7 +79,7 @@ body {
 .profile-content p,
 .profile-content li,
 .profile-content blockquote {
-  font-size: clamp(15px, 1.45vw, 21px);
+  font-size: inherit;
 }
 
 .profile-content p,
@@ -185,8 +185,8 @@ body {
 }
 
 @media (max-width: 860px) {
-  .top { grid-template-columns: 110px 1fr; }
-  .avatar-box { width: 120px; height: 120px; border-radius: 20px; }
+  .top { grid-template-columns: 132px 1fr; }
+  .avatar-box { width: 132px; height: 132px; border-radius: 20px; }
   .cards-root { min-height: 430px; }
   .stack-stage { height: 420px; }
 }
