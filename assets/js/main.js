@@ -761,17 +761,29 @@ function buildDetailBodyHtml(rawHtml, heroSrc) {
 }
 
 function syncBodyWidthToHero(modalEl) {
+  const split = modalEl.querySelector(".modal-split");
   const leftPane = modalEl.querySelector(".modal-left");
   const heroImg = modalEl.querySelector(".modal-hero-img");
-  if (!leftPane) return;
+  if (!leftPane || !split) return;
 
   const applyWidth = () => {
     if (!heroImg || !heroImg.getBoundingClientRect) {
       leftPane.style.removeProperty("--hero-body-width");
+      split.style.removeProperty("--left-pane-width");
       return;
     }
-    const w = Math.max(220, Math.floor(heroImg.getBoundingClientRect().width));
-    leftPane.style.setProperty("--hero-body-width", `${w}px`);
+
+    const imgW = Math.max(220, Math.floor(heroImg.getBoundingClientRect().width));
+    leftPane.style.setProperty("--hero-body-width", `${imgW}px`);
+
+    const paneStyle = getComputedStyle(leftPane);
+    const padL = parseFloat(paneStyle.paddingLeft) || 0;
+    const padR = parseFloat(paneStyle.paddingRight) || 0;
+    const splitW = split.getBoundingClientRect().width || 0;
+    const minRight = 300;
+    const desiredLeft = imgW + padL + padR + 18;
+    const leftTrack = Math.max(420, Math.min(desiredLeft, Math.max(420, splitW - minRight)));
+    split.style.setProperty("--left-pane-width", `${Math.floor(leftTrack)}px`);
   };
 
   applyWidth();

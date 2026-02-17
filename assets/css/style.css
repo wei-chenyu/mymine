@@ -484,7 +484,7 @@ body.custom-bg {
   width: 100%;
   height: 100%;
   display: grid;
-  grid-template-columns: 1.65fr 1fr;
+  grid-template-columns: minmax(420px, var(--left-pane-width, 1fr)) minmax(280px, 1fr);
   gap: 12px;
 }
 
@@ -553,9 +553,12 @@ body.custom-bg {
 }
 
 .right-entry {
-  width: fit-content;
-  min-width: 220px;
-  max-width: 280px;
+  width: 100%;
+  max-width: none;
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.4);
@@ -578,8 +581,8 @@ body.custom-bg {
 }
 
 .right-entry-cover {
-  width: 130px;
-  height: 174px;
+  width: 88px;
+  height: 116px;
   border-radius: 8px;
   object-fit: cover;
   display: block;
@@ -594,11 +597,11 @@ body.custom-bg {
 }
 
 .right-entry-title {
-  margin-top: 7px;
+  margin-top: 0;
   color: var(--text);
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.28;
-  max-width: 130px;
+  max-width: none;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -612,10 +615,10 @@ body.custom-bg {
 
 .modal-body {
   width: min(var(--hero-body-width), 100%);
-  background: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(20px) saturate(1.06);
-  -webkit-backdrop-filter: blur(20px) saturate(1.06);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(24px) saturate(1.1);
+  -webkit-backdrop-filter: blur(24px) saturate(1.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 14px;
   padding: 14px 16px;
   color: var(--muted);
@@ -704,17 +707,16 @@ body.custom-bg {
   }
 
   .right-entry {
-    min-width: 170px;
-    max-width: 220px;
+    grid-template-columns: 76px minmax(0, 1fr);
   }
 
   .right-entry-cover {
-    width: 104px;
-    height: 138px;
+    width: 76px;
+    height: 102px;
   }
 
   .right-entry-title {
-    max-width: 104px;
+    max-width: none;
   }
 }
 
