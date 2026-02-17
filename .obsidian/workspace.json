@@ -53,7 +53,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "空怀冰川",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -183,7 +183,7 @@
       "bases:新建数据库": false
     }
   },
-  "active": "92c0ac730be54bf8",
+  "active": "fb0701b539b78951",
   "lastOpenFiles": [
     "background.jpg",
     "V604P[7RN[Z0LRZI`31NY~7.jpg",
