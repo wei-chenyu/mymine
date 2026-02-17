@@ -18,6 +18,7 @@ const state = {
   parentById: new Map(),
   noteByPublicPath: new Map(),
   noteByBasename: new Map(),
+  backActions: [],
   // 层级栈：每层 { nodes, expandedIndex, focusIndex }
   levels: [],
   transitioning: false,
@@ -43,6 +44,7 @@ fetch("assets/data/manifest.json", { cache: "no-cache" })
       expandedIndex: null,
       focusIndex: Math.floor(tree.children.length / 2)
     }];
+    initBackNavigation();
     initCards();
     setupSwipeNavigation();
   })
@@ -58,6 +60,46 @@ function renderProfile(profile) {
 
 function renderEmpty(text) {
   treeRootEl.innerHTML = `<div class="empty">${escapeHtml(text)}</div>`;
+}
+
+function initBackNavigation() {
+  const current = history.state || {};
+  if (!current.__mymine_base) {
+    history.replaceState({ ...current, __mymine_base: true, __mymine_depth: 0 }, "");
+  }
+  window.addEventListener("popstate", () => {
+    const action = state.backActions.pop();
+    if (!action || typeof action.undo !== "function") return;
+    action.undo();
+  });
+}
+
+function pushBackAction(type, undo) {
+  state.backActions.push({ type, undo });
+  const current = history.state || {};
+  history.pushState(
+    { ...current, __mymine_base: true, __mymine_depth: state.backActions.length },
+    ""
+  );
+}
+
+function requestBackAction(type) {
+  const last = state.backActions[state.backActions.length - 1];
+  if (last && (!type || last.type === type)) {
+    history.back();
+    return true;
+  }
+  return false;
+}
+
+function collapseOneLevelByBack() {
+  if (state.transitioning) {
+    setTimeout(collapseOneLevelByBack, 80);
+    return;
+  }
+  if (state.levels.length > 1) {
+    collapseToLevel(state.levels.length - 2);
+  }
 }
 
 function buildNodeIndexes() {
@@ -299,6 +341,8 @@ function expandFolder(level, idx) {
       }, 550);
     });
   });
+
+  pushBackAction("folder", collapseOneLevelByBack);
 }
 
 // ========== 收起到指定层 ==========
@@ -590,21 +634,31 @@ function openFileModal(node) {
 
   renderInModal(node);
 
+  let isClosed = false;
+  let handleEsc = null;
   const closeModal = () => {
+    if (isClosed) return;
+    isClosed = true;
     modal.classList.remove("visible");
     setTimeout(() => modal.remove(), 300);
     state.activeFile = null;
+    if (handleEsc) document.removeEventListener("keydown", handleEsc);
   };
 
-  modal.querySelector(".modal-backdrop").addEventListener("click", closeModal);
+  const requestCloseModal = () => {
+    if (!requestBackAction("modal")) closeModal();
+  };
 
-  const handleEsc = e => {
+  modal.querySelector(".modal-backdrop").addEventListener("click", requestCloseModal);
+
+  handleEsc = e => {
     if (e.key === "Escape") {
-      closeModal();
-      document.removeEventListener("keydown", handleEsc);
+      requestCloseModal();
     }
   };
   document.addEventListener("keydown", handleEsc);
+
+  pushBackAction("modal", closeModal);
 }
 
 function getLinkedNotes(noteNode) {
