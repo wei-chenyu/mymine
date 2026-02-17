@@ -17,6 +17,7 @@ const state = {
   nodeById: new Map(),
   parentById: new Map(),
   noteByPublicPath: new Map(),
+  noteByBasename: new Map(),
   // 层级栈：每层 { nodes, expandedIndex, focusIndex }
   levels: [],
   transitioning: false,
@@ -63,6 +64,7 @@ function buildNodeIndexes() {
   state.nodeById.clear();
   state.parentById.clear();
   state.noteByPublicPath.clear();
+  state.noteByBasename.clear();
 
   const walk = (nodes, parentId = null) => {
     nodes.forEach(node => {
@@ -71,6 +73,8 @@ function buildNodeIndexes() {
       if (node.type === "note") {
         const p = normalizePath(`content/${node.id}`);
         state.noteByPublicPath.set(p, node);
+        const basename = normalizePath((node.id.split("/").pop() || "").replace(/\.md$/i, ""));
+        if (basename) state.noteByBasename.set(basename, node);
       }
       if (node.children && node.children.length > 0) walk(node.children, node.id);
     });
@@ -612,15 +616,37 @@ function getLinkedNotes(noteNode) {
 
   while ((m = reg.exec(html)) !== null) {
     const raw = (m[1] || "").split("#")[0].split("?")[0];
-    const normalized = normalizePath(raw);
-    if (!normalized || !normalized.endsWith(".md")) continue;
-    const hit = state.noteByPublicPath.get(normalized);
+    const hit = resolveLinkedNote(raw);
     if (!hit || hit.id === noteNode.id || seen.has(hit.id)) continue;
     seen.add(hit.id);
     hits.push({ node: hit, type: "note" });
   }
 
   return hits;
+}
+
+function resolveLinkedNote(rawHref) {
+  const normalized = normalizePath(rawHref);
+  if (!normalized) return null;
+
+  const candidates = new Set();
+  candidates.add(normalized);
+  candidates.add(normalized.replace(/^\.\//, ""));
+  candidates.add(normalized.replace(/^content\//, ""));
+  if (!normalized.endsWith(".md")) {
+    candidates.add(`${normalized}.md`);
+    candidates.add(`content/${normalized}.md`);
+  }
+  if (!normalized.startsWith("content/")) candidates.add(`content/${normalized}`);
+
+  for (const c of candidates) {
+    const hit = state.noteByPublicPath.get(normalizePath(c));
+    if (hit) return hit;
+  }
+
+  const base = normalizePath(normalized.split("/").pop() || "").replace(/\.md$/i, "");
+  if (base && state.noteByBasename.has(base)) return state.noteByBasename.get(base);
+  return null;
 }
 
 function getSiblingEntries(noteNode) {
