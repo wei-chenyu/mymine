@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "content/一级2/？.md",
+                "file": "content/一级1/封面.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "？"
+              "title": "封面"
             }
           }
         ]
@@ -185,17 +185,18 @@
   },
   "active": "92c0ac730be54bf8",
   "lastOpenFiles": [
+    "content/一级1/串门.md",
+    "content/一级1/封面.md",
+    "content/一级2/陵湍.png",
+    "content/一级3/e.jpg",
+    "content/一级3/vc.md",
+    "content/一级3/二级3/未命名.md",
+    "content/一级2/？.md",
     "background.jpg",
     "backgroun.jpg",
-    "content/一级1/二级文件 1.md",
     "content/一级1/二级1/二级文件.md",
     "content/一级1/白旬.jpg",
-    "content/一级1/串门.md",
     "V604P[7RN[Z0LRZI`31NY~7.jpg",
-    "content/一级2/？.md",
-    "content/一级3/二级3/未命名.md",
-    "content/一级3/vc.md",
-    "content/一级3/e.jpg",
     "assets/css/style.css.tmp.5248.1771293919852",
     "assets/js/main.js.tmp.5248.1771293860833",
     "assets/js/main.js.tmp.5248.1771293852840",
@@ -206,7 +207,6 @@
     "index.html.tmp.5248.1771292786438",
     "assets/css/style.css.tmp.5248.1771292781534",
     "assets/css/style.css.tmp.5248.1771292773125",
-    "content/一级2/陵湍.png",
     "content/一级3/二级3/s.jpg",
     "content/一级1/一级文件.md",
     "profile.md",
