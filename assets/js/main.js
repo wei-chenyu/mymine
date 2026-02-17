@@ -273,6 +273,8 @@ function layoutAll() {
         el.style.opacity = String(opacity);
       }
 
+      const isCentered = isActive && pos === 0;
+      el.classList.toggle('is-centered', isCentered);
       el.dataset.ringPos = String(pos);
     });
   });
@@ -476,6 +478,9 @@ function createFolderVisual(node) {
   const wrap = document.createElement('div');
   wrap.className = 'folder-card-wrap';
 
+  const noteFan = createFolderNoteFan(node);
+  if (noteFan) wrap.appendChild(noteFan);
+
   const tab = document.createElement('div');
   tab.className = 'folder-tab';
   wrap.appendChild(tab);
@@ -526,6 +531,57 @@ function createFolderVisual(node) {
 
   wrap.appendChild(body);
   return wrap;
+}
+
+function createFolderNoteFan(folder) {
+  const notes = collectPreviewNotes(folder, 3);
+  if (notes.length === 0) return null;
+
+  const fan = document.createElement('div');
+  fan.className = 'folder-note-fan';
+
+  notes.forEach(note => {
+    const card = document.createElement('div');
+    card.className = 'fan-note';
+
+    const cover = note.images && note.images.length > 0 ? note.images[0] : '';
+    if (cover) {
+      const img = document.createElement('img');
+      img.className = 'fan-note-img';
+      img.src = cover;
+      img.alt = note.title || '';
+      img.loading = 'lazy';
+      card.appendChild(img);
+    } else {
+      const text = document.createElement('div');
+      text.className = 'fan-note-text';
+      text.textContent = (note.title || 'MD').slice(0, 2);
+      card.appendChild(text);
+    }
+
+    fan.appendChild(card);
+  });
+
+  return fan;
+}
+
+function collectPreviewNotes(folder, limit = 3) {
+  const out = [];
+
+  const walk = nodes => {
+    if (!nodes || out.length >= limit) return;
+    for (const child of nodes) {
+      if (out.length >= limit) break;
+      if (child.type === 'note') {
+        out.push(child);
+      } else if (child.type === 'folder' && child.children && child.children.length > 0) {
+        walk(child.children);
+      }
+    }
+  };
+
+  walk(folder.children || []);
+  return out;
 }
 
 function collectDirectImages(folder) {
