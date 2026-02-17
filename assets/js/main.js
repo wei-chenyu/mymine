@@ -7,8 +7,8 @@ if (avatarEl) {
   avatarEl.onerror = () => { avatarEl.src = "assets/img/avatar-fallback.svg"; };
 }
 
-const HOVER_DELAY = 520; // 悬停多久后才旋转（毫秒）
-const HOVER_COOLDOWN = 420; // 切换后冷却周期，避免过快连续跳转
+const HOVER_DELAY = 760; // 悬停多久后才旋转（毫秒）
+const HOVER_COOLDOWN = 620; // 切换后冷却周期，避免过快连续跳转
 const SWIPE_MIN_DISTANCE = 44;
 let hoverTimer = null;
 
@@ -539,7 +539,6 @@ function openFileModal(node) {
   modal.innerHTML = `
     <div class="modal-backdrop"></div>
     <div class="modal-content">
-      <button class="modal-close">&times;</button>
       <div class="modal-split">
         <section class="modal-left">
           <h2 class="modal-left-title"></h2>
@@ -567,9 +566,10 @@ function openFileModal(node) {
     state.activeFile = current.id;
     titleEl.textContent = current.title || "";
     const hero = (current.images && current.images[0]) || "";
-    heroEl.innerHTML = hero ? `<img src="${hero}" alt="${escapeHtml(current.title || "")}" />` : "";
+    heroEl.innerHTML = hero ? `<img class="modal-hero-img" src="${hero}" alt="${escapeHtml(current.title || "")}" />` : "";
     heroEl.classList.toggle("is-empty", !hero);
     bodyEl.innerHTML = buildDetailBodyHtml(current.html || "<p>\u7a7a\u6587\u6863</p>", hero);
+    syncBodyWidthToHero(modal);
 
     const linked = getLinkedNotes(current);
     const sibling = getSiblingEntries(current);
@@ -596,7 +596,6 @@ function openFileModal(node) {
     state.activeFile = null;
   };
 
-  modal.querySelector(".modal-close").addEventListener("click", closeModal);
   modal.querySelector(".modal-backdrop").addEventListener("click", closeModal);
 
   const handleEsc = e => {
@@ -759,6 +758,26 @@ function buildDetailBodyHtml(rawHtml, heroSrc) {
     .find(img => normalizePath(img.getAttribute("src") || "") === normalizedHero);
   if (firstMatched) firstMatched.remove();
   return wrap.innerHTML;
+}
+
+function syncBodyWidthToHero(modalEl) {
+  const leftPane = modalEl.querySelector(".modal-left");
+  const heroImg = modalEl.querySelector(".modal-hero-img");
+  if (!leftPane) return;
+
+  const applyWidth = () => {
+    if (!heroImg || !heroImg.getBoundingClientRect) {
+      leftPane.style.removeProperty("--hero-body-width");
+      return;
+    }
+    const w = Math.max(220, Math.floor(heroImg.getBoundingClientRect().width));
+    leftPane.style.setProperty("--hero-body-width", `${w}px`);
+  };
+
+  applyWidth();
+  if (heroImg && !heroImg.complete) {
+    heroImg.addEventListener("load", applyWidth, { once: true });
+  }
 }
 
 // ========== 工具 ==========

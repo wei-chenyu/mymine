@@ -432,21 +432,23 @@ body.custom-bg {
 .modal-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(17, 22, 34, 0.34);
-  backdrop-filter: blur(10px);
+  background: rgba(17, 22, 34, 0.22);
+  backdrop-filter: blur(16px) saturate(1.1);
+  -webkit-backdrop-filter: blur(16px) saturate(1.1);
 }
 
 .modal-content {
   position: relative;
   width: min(1400px, 96vw);
   height: min(92vh, 980px);
-  background: rgba(255, 255, 255, 0.68);
+  background: rgba(255, 255, 255, 0.38);
   border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.72);
   padding: 16px;
   overflow: hidden;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.16);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(18px) saturate(1.06);
+  -webkit-backdrop-filter: blur(18px) saturate(1.06);
   transform: scale(0.92) translateY(16px);
   transition: transform 0.3s cubic-bezier(0.33, 0, 0.2, 1);
 }
@@ -474,6 +476,10 @@ body.custom-bg {
   background: rgba(255, 255, 255, 0.9);
 }
 
+.modal-close {
+  display: none;
+}
+
 .modal-split {
   width: 100%;
   height: 100%;
@@ -488,8 +494,9 @@ body.custom-bg {
   min-height: 0;
   border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.72);
-  background: rgba(255, 255, 255, 0.45);
-  backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.26);
+  backdrop-filter: blur(22px) saturate(1.08);
+  -webkit-backdrop-filter: blur(22px) saturate(1.08);
 }
 
 .modal-left {
@@ -497,6 +504,7 @@ body.custom-bg {
   padding: 20px 22px;
   text-align: left;
   overscroll-behavior: contain;
+  --hero-body-width: 100%;
 }
 
 .modal-left-title {
@@ -541,16 +549,19 @@ body.custom-bg {
 .modal-grid {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .right-entry {
-  width: 100%;
+  width: fit-content;
+  min-width: 220px;
+  max-width: 280px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(14px);
-  padding: 7px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  padding: 8px;
   text-align: left;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -567,8 +578,8 @@ body.custom-bg {
 }
 
 .right-entry-cover {
-  width: 100%;
-  aspect-ratio: 3 / 4;
+  width: 130px;
+  height: 174px;
   border-radius: 8px;
   object-fit: cover;
   display: block;
@@ -583,10 +594,14 @@ body.custom-bg {
 }
 
 .right-entry-title {
-  margin-top: 8px;
+  margin-top: 7px;
   color: var(--text);
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.28;
+  max-width: 130px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .modal-grid-empty {
@@ -596,8 +611,10 @@ body.custom-bg {
 }
 
 .modal-body {
-  background: rgba(255, 255, 255, 0.42);
-  backdrop-filter: blur(14px);
+  width: min(var(--hero-body-width), 100%);
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(20px) saturate(1.06);
+  -webkit-backdrop-filter: blur(20px) saturate(1.06);
   border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: 14px;
   padding: 14px 16px;
@@ -684,6 +701,20 @@ body.custom-bg {
   .modal-grid {
     display: flex;
     flex-direction: column;
+  }
+
+  .right-entry {
+    min-width: 170px;
+    max-width: 220px;
+  }
+
+  .right-entry-cover {
+    width: 104px;
+    height: 138px;
+  }
+
+  .right-entry-title {
+    max-width: 104px;
   }
 }
 
