@@ -5,9 +5,11 @@ import { marked } from "marked";
 
 const ROOT = path.resolve("content");
 const PROFILE_MD = path.resolve("profile.md");
+const REPO_ROOT = path.resolve(".");
 
 const IMAGE_EXT = new Set([".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".bmp"]);
 const VIDEO_EXT = new Set([".mp4", ".webm", ".ogg", ".mov"]);
+const COMMON_EXT = [".md", ".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg", ".bmp", ".mp4", ".webm", ".ogg", ".mov"];
 
 async function exists(p) {
   try {
@@ -42,13 +44,41 @@ async function collectContentFiles() {
   return fileSet;
 }
 
+async function collectRepoFiles() {
+  const fileSet = new Set();
+  const basenameIndex = new Map();
+  const skipDir = new Set([".git", "node_modules"]);
+
+  async function walk(dir, base = "") {
+    const entries = await fs.readdir(dir, { withFileTypes: true });
+    for (const e of entries) {
+      if (e.name.startsWith(".") && e.name !== ".github") continue;
+      if (e.isDirectory() && skipDir.has(e.name)) continue;
+
+      const full = path.join(dir, e.name);
+      const rel = path.posix.join(base, e.name).replace(/\\/g, "/");
+      if (e.isDirectory()) {
+        await walk(full, rel);
+      } else if (e.isFile()) {
+        fileSet.add(rel);
+        const baseName = path.posix.basename(rel);
+        if (!basenameIndex.has(baseName)) basenameIndex.set(baseName, []);
+        basenameIndex.get(baseName).push(rel);
+      }
+    }
+  }
+
+  await walk(REPO_ROOT);
+  return { fileSet, basenameIndex };
+}
+
 function toPublicPathFromContent(relPath) {
   const clean = relPath.replace(/\\/g, "/");
   if (clean.startsWith("media/") || clean.startsWith("/media/")) return clean.replace(/^\//, "");
   return `content/${clean}`;
 }
 
-function resolveTarget(rawTarget, currentDirRel, contentFileSet) {
+function resolveTarget(rawTarget, currentDirRel, contentFileSet, repoFileSet, repoBasenameIndex) {
   const cleaned = rawTarget.trim().replace(/\\/g, "/").replace(/^\.\/+/, "");
   const candidates = [];
 
@@ -73,19 +103,43 @@ function resolveTarget(rawTarget, currentDirRel, contentFileSet) {
     if (contentFileSet.has(c)) return toPublicPathFromContent(c);
   }
 
+  for (const c of candidates) {
+    const repoCandidate = c.startsWith("content/") ? c : `content/${c}`.replace(/\/+/g, "/");
+    if (repoFileSet.has(repoCandidate)) return repoCandidate;
+    if (repoFileSet.has(c)) return c;
+  }
+
+  const normalized = cleaned.replace(/^\//, "");
+  if (repoFileSet.has(normalized)) return normalized;
+  if (!path.posix.extname(normalized)) {
+    for (const ext of COMMON_EXT) {
+      const withExt = `${normalized}${ext}`;
+      if (repoFileSet.has(withExt)) return withExt;
+    }
+  }
+
+  const basename = path.posix.basename(normalized);
+  const basenameHits = repoBasenameIndex.get(basename) || [];
+  if (basenameHits.length > 0) {
+    const preferred = basenameHits.find(p => p.startsWith(`content/${currentDirRel}/`))
+      || basenameHits.find(p => p.startsWith("content/"))
+      || basenameHits[0];
+    if (preferred) return preferred;
+  }
+
   if (cleaned.startsWith("media/")) return cleaned;
   if (cleaned.startsWith("../media/")) return cleaned.replace(/^\.\.\//, "");
   if (cleaned.startsWith("/")) return cleaned.slice(1);
   return cleaned;
 }
 
-function obsidianToMarkdown(md, currentDirRel, contentFileSet) {
+function obsidianToMarkdown(md, currentDirRel, contentFileSet, repoFileSet, repoBasenameIndex) {
   // Embed: ![[target|caption]]
   let out = md.replace(/!\[\[([^\]]+)\]\]/g, (_m, inner) => {
     const [rawTarget, rawCaption = ""] = inner.split("|");
     const target = rawTarget.trim();
     const caption = rawCaption.trim();
-    const publicPath = resolveTarget(target, currentDirRel, contentFileSet);
+    const publicPath = resolveTarget(target, currentDirRel, contentFileSet, repoFileSet, repoBasenameIndex);
     const ext = path.extname(publicPath).toLowerCase();
 
     if (IMAGE_EXT.has(ext)) return `![${caption || path.basename(target)}](${publicPath})`;
@@ -99,7 +153,7 @@ function obsidianToMarkdown(md, currentDirRel, contentFileSet) {
     const [rawTarget, rawLabel = ""] = inner.split("|");
     const target = rawTarget.trim();
     const label = (rawLabel || target).trim();
-    const publicPath = resolveTarget(target, currentDirRel, contentFileSet);
+    const publicPath = resolveTarget(target, currentDirRel, contentFileSet, repoFileSet, repoBasenameIndex);
     return `[${label}](${publicPath})`;
   });
 
@@ -116,9 +170,9 @@ function extractImages(html) {
   return images;
 }
 
-function parseMarkdown(raw, currentDirRel, contentFileSet) {
+function parseMarkdown(raw, currentDirRel, contentFileSet, repoFileSet, repoBasenameIndex) {
   const { content, data } = matter(raw);
-  const normalized = obsidianToMarkdown(content, currentDirRel, contentFileSet);
+  const normalized = obsidianToMarkdown(content, currentDirRel, contentFileSet, repoFileSet, repoBasenameIndex);
   const html = marked.parse(normalized);
   return {
     title: data.title || "",
@@ -152,7 +206,7 @@ function collectFolderImages(children) {
   return { images, coverImage };
 }
 
-async function walk(dir, contentFileSet, base = "") {
+async function walk(dir, contentFileSet, repoFileSet, repoBasenameIndex, base = "") {
   const entries = await fs.readdir(dir, { withFileTypes: true });
   const children = [];
 
@@ -161,7 +215,7 @@ async function walk(dir, contentFileSet, base = "") {
     const full = path.join(dir, e.name);
     const rel = path.posix.join(base, e.name).replace(/\\/g, "/");
     if (e.isDirectory()) {
-      const folderChildren = await walk(full, contentFileSet, rel);
+      const folderChildren = await walk(full, contentFileSet, repoFileSet, repoBasenameIndex, rel);
       const { images, coverImage } = collectFolderImages(folderChildren);
       children.push({
         id: rel,
@@ -173,7 +227,7 @@ async function walk(dir, contentFileSet, base = "") {
       });
     } else if (e.isFile() && e.name.endsWith(".md")) {
       const raw = await fs.readFile(full, "utf8");
-      const parsed = parseMarkdown(raw, base, contentFileSet);
+      const parsed = parseMarkdown(raw, base, contentFileSet, repoFileSet, repoBasenameIndex);
       children.push({
         id: rel,
         type: "note",
@@ -189,7 +243,7 @@ async function walk(dir, contentFileSet, base = "") {
   return children.sort((a, b) => a.title.localeCompare(b.title, "zh-Hans"));
 }
 
-async function buildProfile(contentFileSet) {
+async function buildProfile(contentFileSet, repoFileSet, repoBasenameIndex) {
   if (!(await exists(PROFILE_MD))) {
     return {
       title: "个人简介",
@@ -198,7 +252,7 @@ async function buildProfile(contentFileSet) {
   }
 
   const raw = await fs.readFile(PROFILE_MD, "utf8");
-  const parsed = parseMarkdown(raw, "", contentFileSet);
+  const parsed = parseMarkdown(raw, "", contentFileSet, repoFileSet, repoBasenameIndex);
   return {
     title: parsed.title || "个人简介",
     html: parsed.html
@@ -206,11 +260,12 @@ async function buildProfile(contentFileSet) {
 }
 
 const contentFileSet = await collectContentFiles();
+const { fileSet: repoFileSet, basenameIndex: repoBasenameIndex } = await collectRepoFiles();
 const tree = {
   id: "root",
   title: "content",
-  profile: await buildProfile(contentFileSet),
-  children: await walk(ROOT, contentFileSet)
+  profile: await buildProfile(contentFileSet, repoFileSet, repoBasenameIndex),
+  children: await walk(ROOT, contentFileSet, repoFileSet, repoBasenameIndex)
 };
 
 await fs.mkdir("assets/data", { recursive: true });

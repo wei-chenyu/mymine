@@ -562,11 +562,10 @@ function openFileModal(node) {
   const renderInModal = current => {
     state.activeFile = current.id;
     titleEl.textContent = current.title || "";
-    bodyEl.innerHTML = current.html || "<p>空文档</p>";
-
     const hero = (current.images && current.images[0]) || "";
     heroEl.innerHTML = hero ? `<img src="${hero}" alt="${escapeHtml(current.title || "")}" />` : "";
     heroEl.classList.toggle("is-empty", !hero);
+    bodyEl.innerHTML = buildDetailBodyHtml(current.html || "<p>空文档</p>", hero);
 
     const linked = getLinkedNotes(current);
     const entries = linked.length > 0 ? linked : getSiblingEntries(current);
@@ -692,6 +691,18 @@ function pickDisplayNote(folder) {
   return null;
 }
 
+function buildDetailBodyHtml(rawHtml, heroSrc) {
+  if (!heroSrc) return rawHtml;
+
+  const wrap = document.createElement("div");
+  wrap.innerHTML = rawHtml;
+  const normalizedHero = normalizePath(heroSrc);
+  const firstMatched = [...wrap.querySelectorAll("img")]
+    .find(img => normalizePath(img.getAttribute("src") || "") === normalizedHero);
+  if (firstMatched) firstMatched.remove();
+  return wrap.innerHTML;
+}
+
 // ========== 工具 ==========
 
 function escapeHtml(text) {
@@ -710,4 +721,3 @@ function applyCustomBackgroundIfExists() {
   };
   img.src = "background.jpg";
 }
-

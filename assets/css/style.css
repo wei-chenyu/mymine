@@ -596,6 +596,10 @@ body.custom-bg {
 .modal-body img,
 .modal-body video {
   max-width: 100%;
+  width: auto;
+  height: auto;
+  max-height: 72vh;
+  object-fit: contain;
   border-radius: 12px;
   margin: 16px 0;
   border: 1px solid var(--card-border);

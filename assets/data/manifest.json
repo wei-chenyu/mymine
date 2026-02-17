@@ -16,9 +16,9 @@
           "type": "note",
           "title": "串门",
           "summary": "",
-          "html": "<p><img src=\"e.jpg\" alt=\"e.jpg\"></p>\n",
+          "html": "<p><img src=\"content/%E4%B8%80%E7%BA%A73/e.jpg\" alt=\"e.jpg\"></p>\n",
           "images": [
-            "e.jpg"
+            "content/%E4%B8%80%E7%BA%A73/e.jpg"
           ],
           "textContent": "![[e.jpg]]"
         },
@@ -53,7 +53,7 @@
         }
       ],
       "images": [
-        "e.jpg",
+        "content/%E4%B8%80%E7%BA%A73/e.jpg",
         "content/%E4%B8%80%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg"
       ],
       "coverImage": null
