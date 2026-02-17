@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>模块化作品库</title>
-  <link rel="stylesheet" href="assets/css/style.css?v=10" />
+  <link rel="stylesheet" href="assets/css/style.css?v=11" />
 </head>
 <body>
   <main class="page">
@@ -14,8 +14,10 @@
       </div>
       <section class="intro">
         <p class="eyebrow">PORTFOLIO</p>
-        <h1>个人简介</h1>
-        <p>这里写你的简介内容。比如：我做什么、擅长什么、正在做什么。</p>
+        <h1 id="profile-title">个人简介</h1>
+        <div id="profile-content" class="profile-content">
+          <p>请在仓库根目录创建 <code>profile.md</code>。</p>
+        </div>
         <button id="back-btn" class="back-btn" type="button" hidden>返回上一级</button>
       </section>
     </header>
@@ -25,6 +27,6 @@
     </section>
   </main>
 
-  <script src="assets/js/main.js?v=10"></script>
+  <script src="assets/js/main.js?v=11"></script>
 </body>
 </html>

@@ -4,39 +4,173 @@ import matter from "gray-matter";
 import { marked } from "marked";
 
 const ROOT = path.resolve("content");
-const mediaPrefix = "/media/";
+const PROFILE_MD = path.resolve("profile.md");
 
-async function walk(dir, base = "") {
+const IMAGE_EXT = new Set([".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".bmp"]);
+const VIDEO_EXT = new Set([".mp4", ".webm", ".ogg", ".mov"]);
+
+async function exists(p) {
+  try {
+    await fs.access(p);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function collectContentFiles() {
+  const fileSet = new Set();
+
+  async function walk(dir, base = "") {
+    const entries = await fs.readdir(dir, { withFileTypes: true });
+    for (const e of entries) {
+      if (e.name.startsWith(".")) continue;
+      const full = path.join(dir, e.name);
+      const rel = path.posix.join(base, e.name).replace(/\\/g, "/");
+      if (e.isDirectory()) {
+        await walk(full, rel);
+      } else if (e.isFile()) {
+        fileSet.add(rel);
+      }
+    }
+  }
+
+  if (await exists(ROOT)) {
+    await walk(ROOT);
+  }
+
+  return fileSet;
+}
+
+function toPublicPathFromContent(relPath) {
+  const clean = relPath.replace(/\\/g, "/");
+  if (clean.startsWith("media/") || clean.startsWith("/media/")) return clean.replace(/^\//, "");
+  return `content/${clean}`;
+}
+
+function resolveTarget(rawTarget, currentDirRel, contentFileSet) {
+  const cleaned = rawTarget.trim().replace(/\\/g, "/").replace(/^\.\/+/, "");
+  const candidates = [];
+
+  const fromCurrent = path.posix.normalize(path.posix.join(currentDirRel, cleaned));
+  candidates.push(fromCurrent);
+
+  if (!path.posix.extname(cleaned)) {
+    candidates.push(`${fromCurrent}.md`);
+    candidates.push(`${fromCurrent}.png`);
+    candidates.push(`${fromCurrent}.jpg`);
+    candidates.push(`${fromCurrent}.jpeg`);
+    candidates.push(`${fromCurrent}.webp`);
+  }
+
+  const fromRoot = path.posix.normalize(cleaned.replace(/^\//, ""));
+  if (fromRoot !== fromCurrent) {
+    candidates.push(fromRoot);
+    if (!path.posix.extname(fromRoot)) candidates.push(`${fromRoot}.md`);
+  }
+
+  for (const c of candidates) {
+    if (contentFileSet.has(c)) return toPublicPathFromContent(c);
+  }
+
+  if (cleaned.startsWith("media/")) return cleaned;
+  if (cleaned.startsWith("../media/")) return cleaned.replace(/^\.\.\//, "");
+  if (cleaned.startsWith("/")) return cleaned.slice(1);
+  return cleaned;
+}
+
+function obsidianToMarkdown(md, currentDirRel, contentFileSet) {
+  // Embed: ![[target|caption]]
+  let out = md.replace(/!\[\[([^\]]+)\]\]/g, (_m, inner) => {
+    const [rawTarget, rawCaption = ""] = inner.split("|");
+    const target = rawTarget.trim();
+    const caption = rawCaption.trim();
+    const publicPath = resolveTarget(target, currentDirRel, contentFileSet);
+    const ext = path.extname(publicPath).toLowerCase();
+
+    if (IMAGE_EXT.has(ext)) return `![${caption || path.basename(target)}](${publicPath})`;
+    if (VIDEO_EXT.has(ext)) return `<video controls src="${publicPath}"></video>`;
+    if (ext === ".md") return `[${caption || path.basename(target, ".md")}](${publicPath})`;
+    return `[${caption || target}](${publicPath})`;
+  });
+
+  // Link: [[target|label]]
+  out = out.replace(/\[\[([^\]]+)\]\]/g, (_m, inner) => {
+    const [rawTarget, rawLabel = ""] = inner.split("|");
+    const target = rawTarget.trim();
+    const label = (rawLabel || target).trim();
+    const publicPath = resolveTarget(target, currentDirRel, contentFileSet);
+    return `[${label}](${publicPath})`;
+  });
+
+  return out;
+}
+
+function parseMarkdown(raw, currentDirRel, contentFileSet) {
+  const { content, data } = matter(raw);
+  const normalized = obsidianToMarkdown(content, currentDirRel, contentFileSet);
+  return {
+    title: data.title || "",
+    summary: data.summary || "",
+    html: marked.parse(normalized)
+  };
+}
+
+async function walk(dir, contentFileSet, base = "") {
   const entries = await fs.readdir(dir, { withFileTypes: true });
   const children = [];
+
   for (const e of entries) {
     if (e.name.startsWith(".")) continue;
     const full = path.join(dir, e.name);
-    const rel = path.join(base, e.name).replace(/\\/g, "/");
+    const rel = path.posix.join(base, e.name).replace(/\\/g, "/");
     if (e.isDirectory()) {
       children.push({
         id: rel,
         type: "folder",
         title: e.name,
-        children: await walk(full, rel)
+        children: await walk(full, contentFileSet, rel)
       });
     } else if (e.isFile() && e.name.endsWith(".md")) {
       const raw = await fs.readFile(full, "utf8");
-      const { content, data } = matter(raw);
-      const html = marked.parse(content);
+      const parsed = parseMarkdown(raw, base, contentFileSet);
       children.push({
         id: rel,
         type: "note",
-        title: data.title || e.name.replace(/\\.md$/, ""),
-        summary: data.summary || "",
-        html
+        title: parsed.title || e.name.replace(/\.md$/, ""),
+        summary: parsed.summary || "",
+        html: parsed.html
       });
     }
   }
+
   return children.sort((a, b) => a.title.localeCompare(b.title, "zh-Hans"));
 }
 
-const tree = { id: "root", title: "内容库", children: await walk(ROOT) };
+async function buildProfile(contentFileSet) {
+  if (!(await exists(PROFILE_MD))) {
+    return {
+      title: "个人简介",
+      html: "<p>请在仓库根目录创建 profile.md。</p>"
+    };
+  }
+
+  const raw = await fs.readFile(PROFILE_MD, "utf8");
+  const parsed = parseMarkdown(raw, "", contentFileSet);
+  return {
+    title: parsed.title || "个人简介",
+    html: parsed.html
+  };
+}
+
+const contentFileSet = await collectContentFiles();
+const tree = {
+  id: "root",
+  title: "content",
+  profile: await buildProfile(contentFileSet),
+  children: await walk(ROOT, contentFileSet)
+};
+
 await fs.mkdir("assets/data", { recursive: true });
 await fs.writeFile("assets/data/manifest.json", JSON.stringify(tree, null, 2));
 console.log("manifest updated");

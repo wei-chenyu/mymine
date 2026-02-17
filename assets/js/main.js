@@ -1,4 +1,6 @@
 const avatarEl = document.getElementById("avatar");
+const profileTitleEl = document.getElementById("profile-title");
+const profileContentEl = document.getElementById("profile-content");
 const stageEl = document.getElementById("stack-stage");
 const backBtn = document.getElementById("back-btn");
 
@@ -19,6 +21,7 @@ backBtn.addEventListener("click", goBack);
 fetch("assets/data/manifest.json", { cache: "no-cache" })
   .then((r) => r.json())
   .then((tree) => {
+    if (tree.profile) renderProfile(tree.profile);
     const roots = tree.children || [];
     if (!roots.length) {
       renderEmpty("暂无内容，请在 content 里添加文件夹或 Markdown。");
@@ -107,6 +110,11 @@ function toggleBack() {
 
 function renderEmpty(text) {
   stageEl.innerHTML = `<div class="empty">${escapeHtml(text)}</div>`;
+}
+
+function renderProfile(profile) {
+  if (profileTitleEl && profile.title) profileTitleEl.textContent = profile.title;
+  if (profileContentEl) profileContentEl.innerHTML = profile.html || "<p>profile.md 为空。</p>";
 }
 
 function shortestOffset(index, center, total) {
