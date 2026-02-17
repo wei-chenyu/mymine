@@ -106,14 +106,50 @@ function obsidianToMarkdown(md, currentDirRel, contentFileSet) {
   return out;
 }
 
+function extractImages(html) {
+  const images = [];
+  const imgRegex = /<img[^>]+src="([^"]+)"/g;
+  let match;
+  while ((match = imgRegex.exec(html)) !== null) {
+    images.push(match[1]);
+  }
+  return images;
+}
+
 function parseMarkdown(raw, currentDirRel, contentFileSet) {
   const { content, data } = matter(raw);
   const normalized = obsidianToMarkdown(content, currentDirRel, contentFileSet);
+  const html = marked.parse(normalized);
   return {
     title: data.title || "",
     summary: data.summary || "",
-    html: marked.parse(normalized)
+    html: html,
+    images: extractImages(html),
+    textContent: content.slice(0, 200)
   };
+}
+
+function collectFolderImages(children) {
+  const images = [];
+  let coverImage = null;
+
+  // 查找 "封面.md" 作为主图
+  const coverFile = children.find(c =>
+    c.type === 'note' &&
+    (c.title === '封面' || c.id.endsWith('封面.md'))
+  );
+  if (coverFile && coverFile.images && coverFile.images.length > 0) {
+    coverImage = coverFile.images[0];
+  }
+
+  // 收集所有直接子级 md 文件的图像
+  for (const child of children) {
+    if (child.type === 'note' && child.images) {
+      images.push(...child.images);
+    }
+  }
+
+  return { images, coverImage };
 }
 
 async function walk(dir, contentFileSet, base = "") {
@@ -125,11 +161,15 @@ async function walk(dir, contentFileSet, base = "") {
     const full = path.join(dir, e.name);
     const rel = path.posix.join(base, e.name).replace(/\\/g, "/");
     if (e.isDirectory()) {
+      const folderChildren = await walk(full, contentFileSet, rel);
+      const { images, coverImage } = collectFolderImages(folderChildren);
       children.push({
         id: rel,
         type: "folder",
         title: e.name,
-        children: await walk(full, contentFileSet, rel)
+        children: folderChildren,
+        images: images,
+        coverImage: coverImage
       });
     } else if (e.isFile() && e.name.endsWith(".md")) {
       const raw = await fs.readFile(full, "utf8");
@@ -139,7 +179,9 @@ async function walk(dir, contentFileSet, base = "") {
         type: "note",
         title: parsed.title || e.name.replace(/\.md$/, ""),
         summary: parsed.summary || "",
-        html: parsed.html
+        html: parsed.html,
+        images: parsed.images,
+        textContent: parsed.textContent
       });
     }
   }

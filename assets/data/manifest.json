@@ -21,18 +21,30 @@
               "type": "note",
               "title": "二级文件",
               "summary": "",
-              "html": "<p><img src=\"content/%E4%B8%80%E7%BA%A71/%E4%BA%8C%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg\" alt=\"白旬.jpg\"></p>\n"
+              "html": "<p><img src=\"content/%E4%B8%80%E7%BA%A71/%E4%BA%8C%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg\" alt=\"白旬.jpg\"></p>\n",
+              "images": [
+                "content/%E4%B8%80%E7%BA%A71/%E4%BA%8C%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg"
+              ],
+              "textContent": "![[白旬.jpg]]"
             }
-          ]
+          ],
+          "images": [
+            "content/%E4%B8%80%E7%BA%A71/%E4%BA%8C%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg"
+          ],
+          "coverImage": null
         },
         {
           "id": "一级1/一级文件.md",
           "type": "note",
           "title": "一级文件",
           "summary": "",
-          "html": "<p>1</p>\n"
+          "html": "<p>1</p>\n",
+          "images": [],
+          "textContent": "1"
         }
-      ]
+      ],
+      "images": [],
+      "coverImage": null
     },
     {
       "id": "一级2",
@@ -43,9 +55,13 @@
           "id": "一级2/二级2",
           "type": "folder",
           "title": "二级2",
-          "children": []
+          "children": [],
+          "images": [],
+          "coverImage": null
         }
-      ]
+      ],
+      "images": [],
+      "coverImage": null
     },
     {
       "id": "一级3",
@@ -56,9 +72,13 @@
           "id": "一级3/二级3",
           "type": "folder",
           "title": "二级3",
-          "children": []
+          "children": [],
+          "images": [],
+          "coverImage": null
         }
-      ]
+      ],
+      "images": [],
+      "coverImage": null
     }
   ]
 }
