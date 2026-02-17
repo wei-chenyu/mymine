@@ -104,6 +104,48 @@ body {
   border: 1px solid var(--card-border);
 }
 
+/* ===== 面包屑导航 ===== */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 20px;
+  font-size: 14px;
+  color: var(--muted);
+  max-width: 1400px;
+  margin: 0 auto;
+  user-select: none;
+}
+
+.breadcrumb:empty { display: none; }
+
+.bc-item {
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.bc-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+
+.bc-sep {
+  opacity: 0.35;
+  font-size: 13px;
+}
+
+.bc-current {
+  color: var(--accent);
+  cursor: default;
+}
+
+.bc-current:hover {
+  background: none;
+  color: var(--accent);
+}
+
 /* ===== 卡片容器区域 ===== */
 .cards-root {
   margin-top: 18px;
@@ -118,19 +160,18 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  perspective: 1200px;
   position: relative;
-  min-height: 480px;
+  min-height: 440px;
 }
 
-/* ===== 节点 ===== */
+/* ===== 节点（卡片外层） ===== */
 .node {
   position: absolute;
   width: 240px;
   flex-shrink: 0;
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-              opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-              z-index 0s;
+  transition:
+    transform 0.5s cubic-bezier(0.33, 0, 0.2, 1),
+    opacity 0.5s cubic-bezier(0.33, 0, 0.2, 1);
   will-change: transform, opacity;
 }
 
@@ -144,12 +185,13 @@ body {
   cursor: pointer;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
   transition:
-    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.35s cubic-bezier(0.33, 0, 0.2, 1),
     box-shadow 0.35s ease;
 }
 
 .node-card:hover {
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  transform: translateY(-6px);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
 }
 
 /* 标题遮罩 */
@@ -158,31 +200,31 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 16px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+  padding: 14px 16px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 10%, transparent);
   color: var(--text);
-  font-size: clamp(16px, 1.8vw, 22px);
+  font-size: clamp(15px, 1.6vw, 20px);
   font-weight: 600;
   z-index: 10;
   border-radius: 0 0 16px 16px;
 }
 
-/* ===== 文件夹卡片 - 整体造型 ===== */
+/* ===== 文件夹卡片 - 文件夹造型 ===== */
 .folder-card-wrap {
   position: relative;
   width: 100%;
   height: 100%;
 }
 
-/* 文件夹耳朵/标签页 */
+/* 文件夹耳朵 */
 .folder-tab {
   position: absolute;
-  top: -14px;
-  left: 12px;
-  width: 72px;
-  height: 22px;
-  background: linear-gradient(165deg, #26587f, #1b4677);
-  border-radius: 8px 8px 0 0;
+  top: -12px;
+  left: 14px;
+  width: 64px;
+  height: 20px;
+  background: linear-gradient(165deg, #2a6090, #1d4f78);
+  border-radius: 7px 7px 0 0;
   border: 1px solid var(--card-border);
   border-bottom: none;
   z-index: 2;
@@ -200,7 +242,7 @@ body {
   z-index: 3;
 }
 
-/* 文件夹内部图片 */
+/* 文件夹内图像堆叠 */
 .folder-body .image-stack {
   position: relative;
   width: 100%;
@@ -213,64 +255,76 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    transform 0.4s cubic-bezier(0.33, 0, 0.2, 1),
+    opacity 0.4s cubic-bezier(0.33, 0, 0.2, 1);
 }
 
+/* 封面图 */
 .stack-layer.cover {
   z-index: 3;
 }
 
+/* 其他图层堆叠在后方 */
 .stack-layer:not(.cover):nth-child(2) {
   z-index: 2;
-  transform: translateY(-8px) translateX(-4px) rotate(-2deg);
-  opacity: 0.85;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transform: translate(-5px, -6px) rotate(-2deg);
+  opacity: 0.8;
 }
 
 .stack-layer:not(.cover):nth-child(3) {
   z-index: 1;
-  transform: translateY(-16px) translateX(4px) rotate(2deg);
-  opacity: 0.7;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transform: translate(5px, -12px) rotate(2.5deg);
+  opacity: 0.65;
 }
 
 .stack-layer:not(.cover):nth-child(4) {
   z-index: 0;
-  transform: translateY(-24px) translateX(-6px) rotate(-3deg);
-  opacity: 0.55;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transform: translate(-7px, -18px) rotate(-3.5deg);
+  opacity: 0.5;
 }
 
+.stack-layer:not(.cover):nth-child(5) {
+  z-index: -1;
+  transform: translate(8px, -24px) rotate(4deg);
+  opacity: 0.4;
+}
+
+/* 悬停：堆叠图像展开散开 */
 .node-card:hover .stack-layer:not(.cover):nth-child(2) {
-  transform: translateY(-18px) translateX(-12px) rotate(-5deg);
-  opacity: 0.9;
+  transform: translate(-20px, -16px) rotate(-5deg);
+  opacity: 0.92;
 }
 
 .node-card:hover .stack-layer:not(.cover):nth-child(3) {
-  transform: translateY(-36px) translateX(12px) rotate(5deg);
+  transform: translate(20px, -32px) rotate(5deg);
   opacity: 0.85;
 }
 
 .node-card:hover .stack-layer:not(.cover):nth-child(4) {
-  transform: translateY(-54px) translateX(-16px) rotate(-7deg);
-  opacity: 0.75;
+  transform: translate(-24px, -48px) rotate(-7deg);
+  opacity: 0.78;
 }
 
-/* 文件夹底部阴影纹理线 */
+.node-card:hover .stack-layer:not(.cover):nth-child(5) {
+  transform: translate(26px, -60px) rotate(8deg);
+  opacity: 0.7;
+}
+
+/* 文件夹底部装饰线 */
 .folder-body::after {
   content: '';
   position: absolute;
-  bottom: 42px;
-  left: 12px;
-  right: 12px;
+  bottom: 44px;
+  left: 14px;
+  right: 14px;
   height: 1px;
-  background: rgba(154, 205, 255, 0.12);
+  background: rgba(154, 205, 255, 0.1);
   z-index: 5;
   pointer-events: none;
 }
 
-/* 占位符背景（无图像文件夹） */
+/* 占位符（无图像文件夹） */
 .placeholder-bg {
   width: 100%;
   height: 100%;
@@ -280,12 +334,11 @@ body {
   justify-content: center;
 }
 
-/* 无图文件夹内的文件图标 */
 .folder-icon-inner {
-  opacity: 0.18;
+  opacity: 0.15;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   align-items: center;
 }
 
@@ -296,8 +349,8 @@ body {
   border-radius: 2px;
 }
 
-.folder-icon-inner .line:nth-child(2) { width: 48px; }
-.folder-icon-inner .line:nth-child(3) { width: 36px; }
+.folder-icon-inner .line:nth-child(2) { width: 46px; }
+.folder-icon-inner .line:nth-child(3) { width: 32px; }
 
 /* ===== 笔记卡片 ===== */
 .note-visual {
@@ -319,7 +372,7 @@ body {
   padding: 20px;
   background: linear-gradient(165deg, #1b4677, var(--card));
   color: var(--text);
-  font-size: clamp(14px, 1.5vw, 18px);
+  font-size: clamp(13px, 1.4vw, 17px);
   line-height: 1.6;
   overflow: hidden;
   position: relative;
@@ -336,14 +389,14 @@ body {
   pointer-events: none;
 }
 
-.note-text p { margin: 0 0 12px; }
+.note-text p { margin: 0 0 10px; }
 
 .note-text h1,
 .note-text h2,
 .note-text h3 {
   margin: 0 0 8px;
   color: var(--accent);
-  font-size: clamp(16px, 2vw, 22px);
+  font-size: clamp(15px, 1.8vw, 20px);
 }
 
 .note-text img,
@@ -353,69 +406,7 @@ body {
   margin: 8px 0;
 }
 
-/* ===== 展开的子层容器 ===== */
-.children-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(6, 19, 39, 0.88);
-  backdrop-filter: blur(12px);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.children-overlay.visible {
-  opacity: 1;
-  pointer-events: all;
-}
-
-.children-overlay .carousel-inner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  perspective: 1200px;
-  position: relative;
-  width: 100%;
-  min-height: 400px;
-}
-
-.children-overlay .overlay-title {
-  position: absolute;
-  top: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: clamp(20px, 2.5vw, 28px);
-  font-weight: 600;
-  color: var(--accent);
-  z-index: 10;
-  white-space: nowrap;
-}
-
-.children-overlay .overlay-close {
-  position: absolute;
-  top: 20px;
-  right: 24px;
-  width: 40px;
-  height: 40px;
-  border: none;
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text);
-  font-size: 24px;
-  border-radius: 50%;
-  cursor: pointer;
-  z-index: 10;
-  transition: background 0.2s ease;
-}
-
-.children-overlay .overlay-close:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* ===== 模态框 ===== */
+/* ===== 模态框（仅查看文件内容） ===== */
 .modal {
   position: fixed;
   inset: 0;
@@ -425,16 +416,18 @@ body {
   justify-content: center;
   opacity: 0;
   transition: opacity 0.3s ease;
+  pointer-events: none;
 }
 
 .modal.visible {
   opacity: 1;
+  pointer-events: all;
 }
 
 .modal-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(8px);
 }
 
@@ -448,8 +441,8 @@ body {
   padding: 40px;
   overflow-y: auto;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
-  transform: scale(0.9) translateY(20px);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: scale(0.92) translateY(16px);
+  transition: transform 0.3s cubic-bezier(0.33, 0, 0.2, 1);
 }
 
 .modal.visible .modal-content {
@@ -459,26 +452,26 @@ body {
 .modal-content h2 {
   margin: 0 0 20px;
   color: var(--accent);
-  font-size: clamp(24px, 3vw, 32px);
+  font-size: clamp(22px, 2.8vw, 30px);
 }
 
 .modal-close {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  width: 40px;
-  height: 40px;
+  top: 18px;
+  right: 18px;
+  width: 38px;
+  height: 38px;
   border: none;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
   color: var(--text);
-  font-size: 24px;
+  font-size: 22px;
   border-radius: 50%;
   cursor: pointer;
   transition: background 0.2s ease;
 }
 
 .modal-close:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .modal-body {
@@ -521,17 +514,16 @@ body {
 
 /* ===== 空状态 ===== */
 .empty {
-  position: absolute;
-  inset: 0;
   display: grid;
   place-items: center;
   color: var(--muted);
-  font-size: 22px;
+  font-size: 20px;
   text-align: center;
   padding: 40px;
+  min-height: 200px;
 }
 
-/* ===== 响应式设计 ===== */
+/* ===== 响应式 ===== */
 @media (max-width: 860px) {
   .top {
     grid-template-columns: 132px 1fr;
@@ -562,13 +554,20 @@ body {
   }
 
   .node-title {
-    font-size: 14px;
+    font-size: 13px;
     padding: 10px;
+    border-radius: 0 0 12px 12px;
   }
 
   .folder-tab {
-    width: 56px;
-    height: 16px;
-    top: -10px;
+    width: 48px;
+    height: 14px;
+    top: -9px;
+    border-radius: 5px 5px 0 0;
+  }
+
+  .breadcrumb {
+    font-size: 12px;
+    padding: 4px 12px;
   }
 }
