@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "content/一级1/封面.md",
+                "file": "content/一级1/封面1.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "封面"
+              "title": "封面1"
             }
           }
         ]
@@ -187,7 +187,7 @@
   "lastOpenFiles": [
     "backgroun.jpg",
     "content/一级1/串门.md",
-    "content/一级1/封面.md",
+    "content/一级1/封面1.md",
     "content/一级2/陵湍.png",
     "content/一级3/e.jpg",
     "content/一级3/vc.md",
