@@ -9,10 +9,14 @@ if (avatarEl) {
 
 const HOVER_DELAY = 520; // 悬停多久后才旋转（毫秒）
 const HOVER_COOLDOWN = 420; // 切换后冷却周期，避免过快连续跳转
+const SWIPE_MIN_DISTANCE = 44;
 let hoverTimer = null;
 
 const state = {
   tree: {},
+  nodeById: new Map(),
+  parentById: new Map(),
+  noteByPublicPath: new Map(),
   // 层级栈：每层 { nodes, expandedIndex, focusIndex }
   levels: [],
   transitioning: false,
@@ -32,12 +36,14 @@ fetch("assets/data/manifest.json", { cache: "no-cache" })
       return;
     }
     state.tree = tree;
+    buildNodeIndexes();
     state.levels = [{
       nodes: tree.children,
       expandedIndex: null,
       focusIndex: Math.floor(tree.children.length / 2)
     }];
     initCards();
+    setupSwipeNavigation();
   })
   .catch(err => {
     renderEmpty("加载失败");
@@ -51,6 +57,73 @@ function renderProfile(profile) {
 
 function renderEmpty(text) {
   treeRootEl.innerHTML = `<div class="empty">${escapeHtml(text)}</div>`;
+}
+
+function buildNodeIndexes() {
+  state.nodeById.clear();
+  state.parentById.clear();
+  state.noteByPublicPath.clear();
+
+  const walk = (nodes, parentId = null) => {
+    nodes.forEach(node => {
+      state.nodeById.set(node.id, node);
+      if (parentId) state.parentById.set(node.id, parentId);
+      if (node.type === "note") {
+        const p = normalizePath(`content/${node.id}`);
+        state.noteByPublicPath.set(p, node);
+      }
+      if (node.children && node.children.length > 0) walk(node.children, node.id);
+    });
+  };
+
+  walk(state.tree.children || []);
+}
+
+function setupSwipeNavigation() {
+  const zone = document.querySelector(".cards-root") || treeRootEl;
+  let startX = 0;
+  let startY = 0;
+  let touching = false;
+
+  zone.addEventListener("touchstart", e => {
+    if (!e.touches || e.touches.length !== 1) return;
+    const t = e.touches[0];
+    startX = t.clientX;
+    startY = t.clientY;
+    touching = true;
+  }, { passive: true });
+
+  zone.addEventListener("touchend", e => {
+    if (!touching || !e.changedTouches || e.changedTouches.length !== 1) return;
+    touching = false;
+    if (document.getElementById("file-modal")) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - startX;
+    const dy = t.clientY - startY;
+    if (Math.abs(dx) < SWIPE_MIN_DISTANCE) return;
+    if (Math.abs(dx) <= Math.abs(dy)) return;
+    moveFocus(dx < 0 ? 1 : -1);
+  }, { passive: true });
+}
+
+function moveFocus(step) {
+  if (state.transitioning || state.levels.length === 0) return;
+  const L = state.levels[state.levels.length - 1];
+  const n = L.nodes.length;
+  if (!n) return;
+  L.focusIndex = (L.focusIndex + step + n) % n;
+  state.hoverLockedUntil = Date.now() + HOVER_COOLDOWN;
+  layoutAll();
+}
+
+function normalizePath(p) {
+  let s = String(p || "").trim().replace(/\\/g, "/");
+  try {
+    s = decodeURIComponent(s);
+  } catch {}
+  if (s.startsWith("./")) s = s.slice(2);
+  if (s.startsWith("/")) s = s.slice(1);
+  return s;
 }
 
 // ========== 环形位置计算 ==========
@@ -456,39 +529,167 @@ function createNoteVisual(node) {
 // ========== 文件模态框 ==========
 
 function openFileModal(node) {
-  state.activeFile = node.id;
-
-  const modal = document.createElement('div');
-  modal.id = 'file-modal';
-  modal.className = 'modal';
+  const modal = document.createElement("div");
+  modal.id = "file-modal";
+  modal.className = "modal";
   modal.innerHTML = `
     <div class="modal-backdrop"></div>
     <div class="modal-content">
       <button class="modal-close">✕</button>
-      <h2>${escapeHtml(node.title)}</h2>
-      <div class="modal-body">${node.html || '<p>空文档</p>'}</div>
+      <div class="modal-split">
+        <section class="modal-left">
+          <h2 class="modal-left-title"></h2>
+          <div class="modal-hero"></div>
+          <div class="modal-body"></div>
+        </section>
+        <aside class="modal-right">
+          <h3 class="modal-right-title"></h3>
+          <div class="modal-grid"></div>
+        </aside>
+      </div>
     </div>
   `;
 
   document.body.appendChild(modal);
-  requestAnimationFrame(() => modal.classList.add('visible'));
+  requestAnimationFrame(() => modal.classList.add("visible"));
+
+  const titleEl = modal.querySelector(".modal-left-title");
+  const heroEl = modal.querySelector(".modal-hero");
+  const bodyEl = modal.querySelector(".modal-body");
+  const rightTitleEl = modal.querySelector(".modal-right-title");
+  const gridEl = modal.querySelector(".modal-grid");
+
+  const renderInModal = current => {
+    state.activeFile = current.id;
+    titleEl.textContent = current.title || "";
+    bodyEl.innerHTML = current.html || "<p>空文档</p>";
+
+    const hero = (current.images && current.images[0]) || "";
+    heroEl.innerHTML = hero ? `<img src="${hero}" alt="${escapeHtml(current.title || "")}" />` : "";
+    heroEl.classList.toggle("is-empty", !hero);
+
+    const linked = getLinkedNotes(current);
+    const entries = linked.length > 0 ? linked : getSiblingEntries(current);
+    rightTitleEl.textContent = linked.length > 0 ? "双链入口" : "同级入口";
+    gridEl.innerHTML = "";
+
+    if (entries.length === 0) {
+      gridEl.innerHTML = '<div class="modal-grid-empty">暂无可跳转内容</div>';
+      return;
+    }
+
+    entries.forEach(entry => {
+      const card = createRightEntryCard(entry, nextNode => renderInModal(nextNode));
+      gridEl.appendChild(card);
+    });
+  };
+
+  renderInModal(node);
 
   const closeModal = () => {
-    modal.classList.remove('visible');
+    modal.classList.remove("visible");
     setTimeout(() => modal.remove(), 300);
     state.activeFile = null;
   };
 
-  modal.querySelector('.modal-close').addEventListener('click', closeModal);
-  modal.querySelector('.modal-backdrop').addEventListener('click', closeModal);
+  modal.querySelector(".modal-close").addEventListener("click", closeModal);
+  modal.querySelector(".modal-backdrop").addEventListener("click", closeModal);
 
   const handleEsc = e => {
-    if (e.key === 'Escape') {
+    if (e.key === "Escape") {
       closeModal();
-      document.removeEventListener('keydown', handleEsc);
+      document.removeEventListener("keydown", handleEsc);
     }
   };
-  document.addEventListener('keydown', handleEsc);
+  document.addEventListener("keydown", handleEsc);
+}
+
+function getLinkedNotes(noteNode) {
+  const html = noteNode.html || "";
+  const reg = /<a[^>]+href="([^"]+)"/g;
+  const seen = new Set();
+  const hits = [];
+  let m;
+
+  while ((m = reg.exec(html)) !== null) {
+    const raw = (m[1] || "").split("#")[0].split("?")[0];
+    const normalized = normalizePath(raw);
+    if (!normalized || !normalized.endsWith(".md")) continue;
+    const hit = state.noteByPublicPath.get(normalized);
+    if (!hit || hit.id === noteNode.id || seen.has(hit.id)) continue;
+    seen.add(hit.id);
+    hits.push({ node: hit, type: "note" });
+  }
+
+  return hits;
+}
+
+function getSiblingEntries(noteNode) {
+  const parentId = state.parentById.get(noteNode.id);
+  if (!parentId) return [];
+  const parent = state.nodeById.get(parentId);
+  if (!parent || !parent.children) return [];
+
+  return parent.children
+    .filter(child => child.id !== noteNode.id)
+    .map(child => ({ node: child, type: child.type }));
+}
+
+function createRightEntryCard(entry, onOpen) {
+  const el = document.createElement("button");
+  el.className = "right-entry";
+  el.type = "button";
+
+  const targetNode = entry.type === "folder" ? pickDisplayNote(entry.node) : entry.node;
+  const cover = pickEntryCover(entry.node);
+
+  if (cover) {
+    const img = document.createElement("img");
+    img.className = "right-entry-cover";
+    img.src = cover;
+    img.alt = entry.node.title || "";
+    img.loading = "lazy";
+    el.appendChild(img);
+  } else {
+    const ph = document.createElement("div");
+    ph.className = "right-entry-cover right-entry-placeholder";
+    ph.textContent = entry.type === "folder" ? "文件夹" : "笔记";
+    el.appendChild(ph);
+  }
+
+  const title = document.createElement("div");
+  title.className = "right-entry-title";
+  title.textContent = entry.node.title || "";
+  el.appendChild(title);
+
+  if (targetNode) {
+    el.addEventListener("click", () => onOpen(targetNode));
+  } else {
+    el.disabled = true;
+  }
+
+  return el;
+}
+
+function pickEntryCover(node) {
+  if (!node) return null;
+  if (node.type === "note") return (node.images && node.images[0]) || null;
+  return getFolderCover(node, collectDirectImages(node));
+}
+
+function pickDisplayNote(folder) {
+  if (!folder || folder.type !== "folder") return null;
+  const children = folder.children || [];
+  for (const child of children) {
+    if (child.type === "note") return child;
+  }
+  for (const child of children) {
+    if (child.type === "folder") {
+      const found = pickDisplayNote(child);
+      if (found) return found;
+    }
+  }
+  return null;
 }
 
 // ========== 工具 ==========
@@ -509,3 +710,4 @@ function applyCustomBackgroundIfExists() {
   };
   img.src = "background.jpg";
 }
+
