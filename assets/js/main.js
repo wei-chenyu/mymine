@@ -9,13 +9,12 @@ if (avatarEl) {
 
 const state = {
   tree: {},
-  activeFile: null,
-  // 导航栈：每一层记录 { nodes, centerIndex, folderTitle }
-  navStack: [],
-  currentNodes: [],
-  centerIndex: 0,
-  hoveredIndex: -1,
-  transitioning: false
+  // 层级栈：每层 { nodes, expandedIndex }
+  // levels[0] = 顶层，levels[last] = 当前活跃层
+  levels: [],
+  hoveredKey: null, // "level-idx"
+  transitioning: false,
+  activeFile: null
 };
 
 // ========== 初始化 ==========
@@ -29,10 +28,8 @@ fetch("assets/data/manifest.json", { cache: "no-cache" })
       return;
     }
     state.tree = tree;
-    state.currentNodes = tree.children;
-    state.centerIndex = Math.floor(tree.children.length / 2);
-    mountCards(treeRootEl, state.currentNodes, 0); // originX=0，从中心出现
-    renderBreadcrumb();
+    state.levels = [{ nodes: tree.children, expandedIndex: null }];
+    initCards();
   })
   .catch(err => {
     renderEmpty("加载失败");
@@ -48,338 +45,259 @@ function renderEmpty(text) {
   treeRootEl.innerHTML = `<div class="empty">${escapeHtml(text)}</div>`;
 }
 
-// ========== 面包屑 ==========
+// ========== 初始卡片渲染 ==========
 
-function renderBreadcrumb() {
-  let bc = document.getElementById('breadcrumb');
-  if (!bc) {
-    bc = document.createElement('nav');
-    bc.id = 'breadcrumb';
-    bc.className = 'breadcrumb';
-    treeRootEl.parentElement.insertBefore(bc, treeRootEl);
-  }
+function initCards() {
+  const container = treeRootEl;
+  container.innerHTML = '';
 
-  if (state.navStack.length === 0) {
-    bc.style.display = 'none';
-    return;
-  }
-
-  bc.style.display = '';
-  bc.innerHTML = '';
-
-  // 根目录
-  const rootSpan = document.createElement('span');
-  rootSpan.className = 'bc-item';
-  rootSpan.textContent = '首页';
-  rootSpan.addEventListener('click', () => navigateToLevel(0));
-  bc.appendChild(rootSpan);
-
-  // 每一层
-  state.navStack.forEach((entry, i) => {
-    const sep = document.createElement('span');
-    sep.className = 'bc-sep';
-    sep.textContent = ' › ';
-    bc.appendChild(sep);
-
-    const isLast = i === state.navStack.length - 1;
-    const item = document.createElement('span');
-    item.className = isLast ? 'bc-item bc-current' : 'bc-item';
-    item.textContent = entry.folderTitle;
-    if (!isLast) {
-      item.addEventListener('click', () => navigateToLevel(i + 1));
-    }
-    bc.appendChild(item);
-  });
-}
-
-// ========== 轮播：创建卡片并布局 ==========
-
-function mountCards(container, nodes, originX) {
-  if (!nodes || nodes.length === 0) {
-    container.innerHTML = '<div class="empty" style="position:relative;">该目录为空</div>';
-    return;
-  }
-
-  state.centerIndex = Math.floor(nodes.length / 2);
-  state.hoveredIndex = -1;
-
-  nodes.forEach((node, i) => {
+  state.levels[0].nodes.forEach((node, i) => {
     const el = createCardElement(node);
-    el.dataset.idx = i;
-
-    // 初始：全部聚在 originX 处，缩小透明
+    el.dataset.level = '0';
+    el.dataset.idx = String(i);
     el.style.transition = 'none';
-    el.style.transform = `translateX(${originX}px) scale(0.35)`;
+    el.style.transform = 'translateX(0px) scale(0.3)';
     el.style.opacity = '0';
     container.appendChild(el);
-
-    bindCardEvents(el, node, i, container);
+    bindCardEvents(el, node, 0, i);
   });
 
-  // 下一帧：开启 transition，展开到目标位置
   requestAnimationFrame(() => {
     container.querySelectorAll(':scope > .node').forEach(el => {
       el.style.transition = '';
     });
+    requestAnimationFrame(() => layoutAll());
+  });
+}
+
+// ========== 布局计算：所有层级共存 ==========
+
+function layoutAll() {
+  const container = treeRootEl;
+  const activeLevel = state.levels.length - 1;
+  const containerW = container.clientWidth || 1200;
+
+  state.levels.forEach((level, L) => {
+    const cards = container.querySelectorAll(`[data-level="${L}"]`);
+    const count = level.nodes.length;
+    if (count === 0) return;
+    const centerIdx = Math.floor(count / 2);
+
+    if (L === activeLevel) {
+      // 活跃层：正常轮播布局
+      const spacing = Math.min(260, Math.max(140, (containerW * 0.7) / Math.max(count, 2)));
+      const scaleStep = 0.09;
+
+      cards.forEach(el => {
+        const idx = parseInt(el.dataset.idx);
+        const offset = idx - centerIdx;
+        const dist = Math.abs(offset);
+
+        let hoverShift = 0;
+        if (state.hoveredKey === `${L}-${idx}` && offset !== 0) {
+          hoverShift = -offset * 35;
+        }
+
+        const x = offset * spacing + hoverShift;
+        const scale = Math.max(0.58, 1 - dist * scaleStep);
+        const zIndex = 100 - dist * 10 + (state.hoveredKey === `${L}-${idx}` ? 20 : 0);
+        const opacity = Math.max(0.3, 1 - dist * 0.2);
+
+        el.style.transform = `translateX(${x}px) scale(${scale})`;
+        el.style.zIndex = zIndex;
+        el.style.opacity = opacity;
+        el.style.pointerEvents = '';
+        el.classList.remove('dimmed-parent');
+      });
+
+    } else {
+      // 父层：缩小、上移、半透明，保持可见作为上下文
+      const depthDiff = activeLevel - L;
+      const spacing = 55;
+
+      cards.forEach(el => {
+        const idx = parseInt(el.dataset.idx);
+        const offset = idx - centerIdx;
+        const isExpanded = idx === level.expandedIndex;
+
+        const x = offset * spacing;
+        const y = -(170 + depthDiff * 25);
+        const scale = Math.max(0.14, 0.26 - depthDiff * 0.04);
+        const opacity = isExpanded ? 0.35 : 0.1;
+        const zIndex = 8 - depthDiff;
+
+        el.style.transform = `translateX(${x}px) translateY(${y}px) scale(${scale})`;
+        el.style.zIndex = zIndex;
+        el.style.opacity = opacity;
+        // 展开的那张卡片可点击（点击返回该层）
+        el.style.pointerEvents = isExpanded ? '' : 'none';
+        el.classList.toggle('dimmed-parent', true);
+      });
+    }
+  });
+}
+
+// ========== 展开文件夹 ==========
+
+function expandFolder(level, idx) {
+  if (state.transitioning) return;
+  const folder = state.levels[level].nodes[idx];
+  if (!folder.children || folder.children.length === 0) return;
+
+  state.transitioning = true;
+  const container = treeRootEl;
+
+  // 设置展开索引
+  state.levels[level].expandedIndex = idx;
+
+  // 获取点击卡片的当前屏幕位置作为子卡片出发点
+  const clickedEl = container.querySelector(`[data-level="${level}"][data-idx="${idx}"]`);
+  let originX = 0;
+  if (clickedEl) {
+    const cRect = container.getBoundingClientRect();
+    const eRect = clickedEl.getBoundingClientRect();
+    originX = (eRect.left + eRect.width / 2) - (cRect.left + cRect.width / 2);
+  }
+
+  // 添加新层
+  const newLevelIdx = state.levels.length;
+  const newLevel = { nodes: folder.children, expandedIndex: null };
+  state.levels.push(newLevel);
+
+  // 创建子卡片，全部从 originX 处开始
+  newLevel.nodes.forEach((node, i) => {
+    const el = createCardElement(node);
+    el.dataset.level = String(newLevelIdx);
+    el.dataset.idx = String(i);
+    el.style.transition = 'none';
+    el.style.transform = `translateX(${originX}px) scale(0.25)`;
+    el.style.opacity = '0';
+    el.style.zIndex = '200';
+    container.appendChild(el);
+    bindCardEvents(el, node, newLevelIdx, i);
+  });
+
+  // 动画：新卡片展开 + 父层缩小
+  requestAnimationFrame(() => {
+    container.querySelectorAll(`[data-level="${newLevelIdx}"]`).forEach(el => {
+      el.style.transition = '';
+    });
+
     requestAnimationFrame(() => {
-      layoutCards(container);
+      layoutAll();
+
+      setTimeout(() => {
+        // 清理临时 z-index
+        container.querySelectorAll(`[data-level="${newLevelIdx}"]`).forEach(el => {
+          el.style.zIndex = '';
+        });
+        layoutAll();
+        state.transitioning = false;
+      }, 550);
     });
   });
 }
 
-function bindCardEvents(el, node, idx, container) {
-  el.addEventListener('mouseenter', () => {
-    state.hoveredIndex = idx;
-    layoutCards(container);
+// ========== 收起：回到指定层级 ==========
+
+function collapseToLevel(targetLevel) {
+  if (state.transitioning) return;
+  const activeLevel = state.levels.length - 1;
+  if (targetLevel < 0 || targetLevel >= activeLevel) return;
+
+  state.transitioning = true;
+  const container = treeRootEl;
+
+  // 要移除的层级
+  for (let L = targetLevel + 1; L <= activeLevel; L++) {
+    container.querySelectorAll(`[data-level="${L}"]`).forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateX(0px) scale(0.25)';
+      el.style.pointerEvents = 'none';
+    });
+  }
+
+  // 更新状态
+  state.levels.length = targetLevel + 1;
+  state.levels[targetLevel].expandedIndex = null;
+  state.hoveredKey = null;
+
+  // 父层卡片恢复到正常布局
+  requestAnimationFrame(() => {
+    layoutAll();
+
+    setTimeout(() => {
+      // 移除被收起层的 DOM 元素
+      for (let L = targetLevel + 1; L <= activeLevel; L++) {
+        container.querySelectorAll(`[data-level="${L}"]`).forEach(el => el.remove());
+      }
+      state.transitioning = false;
+    }, 550);
   });
+}
+
+// ========== 事件绑定 ==========
+
+function bindCardEvents(el, node, level, idx) {
+  const container = treeRootEl;
+
+  el.addEventListener('mouseenter', () => {
+    if (level === state.levels.length - 1) {
+      state.hoveredKey = `${level}-${idx}`;
+      layoutAll();
+    }
+  });
+
   el.addEventListener('mouseleave', () => {
-    state.hoveredIndex = -1;
-    layoutCards(container);
+    if (state.hoveredKey === `${level}-${idx}`) {
+      state.hoveredKey = null;
+      layoutAll();
+    }
   });
 
   el.querySelector('.node-card').addEventListener('click', e => {
     e.stopPropagation();
     if (state.transitioning) return;
 
+    const activeLevel = state.levels.length - 1;
+
+    // 点击父层的卡片 → 收回到该层
+    if (level < activeLevel) {
+      collapseToLevel(level);
+      return;
+    }
+
+    // 点击活跃层
     if (node.type === 'folder') {
-      // 计算点击卡片相对于容器中心的 X 偏移
-      const containerRect = container.getBoundingClientRect();
-      const cardRect = el.getBoundingClientRect();
-      const clickOriginX = (cardRect.left + cardRect.width / 2)
-        - (containerRect.left + containerRect.width / 2);
-      navigateInto(node, clickOriginX);
+      expandFolder(level, idx);
     } else {
       openFileModal(node);
     }
   });
 }
 
-// ========== 轮播布局计算 ==========
-
-function layoutCards(container) {
-  const cards = container.querySelectorAll(':scope > .node');
-  const count = cards.length;
-  if (count === 0) return;
-
-  const centerIdx = state.centerIndex;
-  const containerW = container.clientWidth || 1200;
-  const cardW = 240;
-
-  // 动态间距：卡片少时宽松，多时紧凑
-  const idealSpacing = Math.min(260, Math.max(140, (containerW * 0.7) / Math.max(count, 2)));
-  const spacing = idealSpacing;
-  const scaleStep = 0.09;
-  const zBase = 100;
-
-  cards.forEach((el, i) => {
-    const offset = i - centerIdx;
-
-    // 悬停偏移：向中心靠拢
-    let hoverShift = 0;
-    if (state.hoveredIndex === i && offset !== 0) {
-      hoverShift = -offset * 35;
-    }
-
-    const x = offset * spacing + hoverShift;
-    const dist = Math.abs(offset);
-    const scale = Math.max(0.58, 1 - dist * scaleStep);
-    const zIndex = zBase - dist * 10 + (state.hoveredIndex === i ? 20 : 0);
-    const opacity = Math.max(0.3, 1 - dist * 0.2);
-
-    el.style.transform = `translateX(${x}px) scale(${scale})`;
-    el.style.zIndex = zIndex;
-    el.style.opacity = opacity;
-  });
-}
-
-// ========== 导航：进入文件夹 ==========
-
-function navigateInto(folder, originX) {
-  if (state.transitioning) return;
-  state.transitioning = true;
-
-  const container = treeRootEl;
-  const oldCards = [...container.querySelectorAll(':scope > .node')];
-
-  // 入栈
-  state.navStack.push({
-    nodes: state.currentNodes,
-    centerIndex: state.centerIndex,
-    folderTitle: folder.title
-  });
-
-  // 更新当前节点
-  state.currentNodes = folder.children || [];
-
-  // 先创建新卡片（在旧卡片上方），从 originX 出发
-  const newCards = [];
-  state.currentNodes.forEach((node, i) => {
-    const el = createCardElement(node);
-    el.dataset.idx = i;
-    el.style.transition = 'none';
-    el.style.transform = `translateX(${originX}px) scale(0.3)`;
-    el.style.opacity = '0';
-    el.style.zIndex = 200;
-    container.appendChild(el);
-    bindCardEvents(el, node, i, container);
-    newCards.push(el);
-  });
-
-  // 同时：旧卡片缩小淡出
-  oldCards.forEach(el => {
-    el.style.pointerEvents = 'none';
-    el.style.opacity = '0';
-    el.style.transform = el.style.transform.replace(/scale\([^)]*\)/, 'scale(0.65)');
-  });
-
-  // 下一帧：新卡片展开到位
-  requestAnimationFrame(() => {
-    newCards.forEach(el => { el.style.transition = ''; });
-    state.centerIndex = Math.floor(state.currentNodes.length / 2);
-    state.hoveredIndex = -1;
-
-    requestAnimationFrame(() => {
-      layoutCards(container);
-
-      // 动画结束后清理
-      setTimeout(() => {
-        oldCards.forEach(el => el.remove());
-        // 恢复 z-index
-        newCards.forEach(el => { el.style.zIndex = ''; });
-        layoutCards(container);
-        state.transitioning = false;
-      }, 520);
-    });
-  });
-
-  renderBreadcrumb();
-}
-
-// ========== 导航：返回上一级 ==========
-
-function navigateBack() {
-  if (state.navStack.length === 0 || state.transitioning) return;
-  state.transitioning = true;
-
-  const prev = state.navStack.pop();
-  const container = treeRootEl;
-  const oldCards = [...container.querySelectorAll(':scope > .node')];
-
-  state.currentNodes = prev.nodes;
-
-  // 旧卡片（当前层）收缩回中心
-  oldCards.forEach(el => {
-    el.style.pointerEvents = 'none';
-    el.style.transform = 'translateX(0px) scale(0.3)';
-    el.style.opacity = '0';
-  });
-
-  // 创建父层卡片，初始状态为放大的背景
-  const newCards = [];
-  state.currentNodes.forEach((node, i) => {
-    const el = createCardElement(node);
-    el.dataset.idx = i;
-    el.style.transition = 'none';
-    el.style.transform = 'translateX(0px) scale(1.15)';
-    el.style.opacity = '0';
-    el.style.zIndex = -1;
-    container.appendChild(el);
-    bindCardEvents(el, node, i, container);
-    newCards.push(el);
-  });
-
-  requestAnimationFrame(() => {
-    newCards.forEach(el => { el.style.transition = ''; });
-    state.centerIndex = prev.centerIndex;
-    state.hoveredIndex = -1;
-
-    requestAnimationFrame(() => {
-      layoutCards(container);
-
-      setTimeout(() => {
-        oldCards.forEach(el => el.remove());
-        newCards.forEach(el => { el.style.zIndex = ''; });
-        layoutCards(container);
-        state.transitioning = false;
-      }, 520);
-    });
-  });
-
-  renderBreadcrumb();
-}
-
-// 跳转到指定层级
-function navigateToLevel(targetLevel) {
-  if (state.transitioning) return;
-  if (targetLevel >= state.navStack.length) return;
-
-  // 取出目标层
-  const target = state.navStack[targetLevel];
-  state.navStack.length = targetLevel;
-
-  state.transitioning = true;
-  const container = treeRootEl;
-  const oldCards = [...container.querySelectorAll(':scope > .node')];
-  state.currentNodes = target.nodes;
-
-  oldCards.forEach(el => {
-    el.style.pointerEvents = 'none';
-    el.style.transform = 'translateX(0px) scale(0.3)';
-    el.style.opacity = '0';
-  });
-
-  const newCards = [];
-  state.currentNodes.forEach((node, i) => {
-    const el = createCardElement(node);
-    el.dataset.idx = i;
-    el.style.transition = 'none';
-    el.style.transform = 'translateX(0px) scale(1.15)';
-    el.style.opacity = '0';
-    container.appendChild(el);
-    bindCardEvents(el, node, i, container);
-    newCards.push(el);
-  });
-
-  requestAnimationFrame(() => {
-    newCards.forEach(el => { el.style.transition = ''; });
-    state.centerIndex = target.centerIndex;
-    state.hoveredIndex = -1;
-    requestAnimationFrame(() => {
-      layoutCards(container);
-      setTimeout(() => {
-        oldCards.forEach(el => el.remove());
-        newCards.forEach(el => { el.style.zIndex = ''; });
-        layoutCards(container);
-        state.transitioning = false;
-      }, 520);
-    });
-  });
-
-  renderBreadcrumb();
-}
-
 // ========== 全局事件 ==========
 
-// 点击空白区域返回上一级
+// 点击空白区域 → 收回一层
 document.addEventListener('click', e => {
   if (state.transitioning) return;
-  // 点在卡片上、模态框上、面包屑上 → 不处理
-  if (e.target.closest('.node-card') || e.target.closest('.modal') || e.target.closest('.breadcrumb')) return;
-  if (state.navStack.length > 0) {
-    navigateBack();
+  if (e.target.closest('.node-card') || e.target.closest('.modal')) return;
+  if (state.levels.length > 1) {
+    collapseToLevel(state.levels.length - 2);
   }
 });
 
-// ESC 键返回
+// ESC → 收回一层
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    const modal = document.getElementById('file-modal');
-    if (modal) return; // 模态框优先
-    if (state.navStack.length > 0) navigateBack();
+    if (document.getElementById('file-modal')) return;
+    if (state.levels.length > 1) {
+      collapseToLevel(state.levels.length - 2);
+    }
   }
 });
 
-// ========== 创建卡片 ==========
+// ========== 创建卡片元素 ==========
 
 function createCardElement(node) {
   const nodeEl = document.createElement('div');
@@ -395,7 +313,6 @@ function createCardElement(node) {
     cardEl.appendChild(createNoteVisual(node));
   }
 
-  // 标题
   const titleEl = document.createElement('div');
   titleEl.className = 'node-title';
   titleEl.textContent = node.title;
@@ -405,22 +322,19 @@ function createCardElement(node) {
   return nodeEl;
 }
 
-// ========== 文件夹视觉：整体文件夹造型 + 堆叠图像 ==========
+// ========== 文件夹视觉 ==========
 
 function createFolderVisual(node) {
   const wrap = document.createElement('div');
   wrap.className = 'folder-card-wrap';
 
-  // 文件夹耳朵
   const tab = document.createElement('div');
   tab.className = 'folder-tab';
   wrap.appendChild(tab);
 
-  // 文件夹主体
   const body = document.createElement('div');
   body.className = 'folder-body';
 
-  // 收集直系子节点中的图像（不递归深层）
   const directImages = collectDirectImages(node);
   const coverImg = getFolderCover(node, directImages);
 
@@ -428,7 +342,6 @@ function createFolderVisual(node) {
     const stackEl = document.createElement('div');
     stackEl.className = 'image-stack';
 
-    // 封面图放最上层
     if (coverImg) {
       const img = document.createElement('img');
       img.className = 'stack-layer cover';
@@ -438,7 +351,6 @@ function createFolderVisual(node) {
       stackEl.appendChild(img);
     }
 
-    // 其他图像（去重，最多4张）
     const others = directImages.filter(s => s !== coverImg).slice(0, 4);
     others.forEach(src => {
       const img = document.createElement('img');
@@ -451,7 +363,6 @@ function createFolderVisual(node) {
 
     body.appendChild(stackEl);
   } else {
-    // 无图像：占位
     const ph = document.createElement('div');
     ph.className = 'placeholder-bg';
     const icon = document.createElement('div');
@@ -469,7 +380,6 @@ function createFolderVisual(node) {
   return wrap;
 }
 
-// 收集直系子节点中的图像（只查直系 note 子节点，不递归）
 function collectDirectImages(folder) {
   const imgs = [];
   if (!folder.children) return imgs;
@@ -481,7 +391,6 @@ function collectDirectImages(folder) {
   return imgs;
 }
 
-// 获取封面图：优先从名为"封面"的直系 md 子节点取
 function getFolderCover(folder, directImages) {
   if (folder.children) {
     const coverNote = folder.children.find(
@@ -491,11 +400,10 @@ function getFolderCover(folder, directImages) {
       return coverNote.images[0];
     }
   }
-  // 回退：manifest 中的 coverImage 或第一张直系图
   return folder.coverImage || directImages[0] || null;
 }
 
-// ========== 笔记卡片视觉 ==========
+// ========== 笔记视觉 ==========
 
 function createNoteVisual(node) {
   const visualEl = document.createElement('div');
@@ -518,7 +426,7 @@ function createNoteVisual(node) {
   return visualEl;
 }
 
-// ========== 文件模态框（仅用于查看文件内容） ==========
+// ========== 文件模态框 ==========
 
 function openFileModal(node) {
   state.activeFile = node.id;
@@ -556,18 +464,7 @@ function openFileModal(node) {
   document.addEventListener('keydown', handleEsc);
 }
 
-// ========== 工具函数 ==========
-
-function findNodeById(tree, id) {
-  if (tree.id === id) return tree;
-  if (tree.children) {
-    for (const child of tree.children) {
-      const found = findNodeById(child, id);
-      if (found) return found;
-    }
-  }
-  return null;
-}
+// ========== 工具 ==========
 
 function escapeHtml(text) {
   return String(text)

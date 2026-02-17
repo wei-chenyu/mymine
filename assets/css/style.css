@@ -104,46 +104,10 @@ body {
   border: 1px solid var(--card-border);
 }
 
-/* ===== 面包屑导航 ===== */
-.breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  padding: 6px 20px;
-  font-size: 14px;
-  color: var(--muted);
-  max-width: 1400px;
-  margin: 0 auto;
-  user-select: none;
-}
-
-.breadcrumb:empty { display: none; }
-
-.bc-item {
+/* ===== 父层卡片（缩小后可点击返回） ===== */
+.node.dimmed-parent .node-card {
   cursor: pointer;
-  padding: 4px 10px;
-  border-radius: 6px;
-  transition: background 0.2s, color 0.2s;
-}
-
-.bc-item:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--text);
-}
-
-.bc-sep {
-  opacity: 0.35;
-  font-size: 13px;
-}
-
-.bc-current {
-  color: var(--accent);
-  cursor: default;
-}
-
-.bc-current:hover {
-  background: none;
-  color: var(--accent);
+  filter: brightness(0.7) saturate(0.5);
 }
 
 /* ===== 卡片容器区域 ===== */
@@ -566,8 +530,4 @@ body {
     border-radius: 5px 5px 0 0;
   }
 
-  .breadcrumb {
-    font-size: 12px;
-    padding: 4px 12px;
-  }
 }
