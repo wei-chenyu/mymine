@@ -9,10 +9,8 @@ if (avatarEl) {
 
 const state = {
   tree: {},
-  // 层级栈：每层 { nodes, expandedIndex }
-  // levels[0] = 顶层，levels[last] = 当前活跃层
+  // 层级栈：每层 { nodes, expandedIndex, focusIndex }
   levels: [],
-  hoveredKey: null, // "level-idx"
   transitioning: false,
   activeFile: null
 };
@@ -28,7 +26,11 @@ fetch("assets/data/manifest.json", { cache: "no-cache" })
       return;
     }
     state.tree = tree;
-    state.levels = [{ nodes: tree.children, expandedIndex: null }];
+    state.levels = [{
+      nodes: tree.children,
+      expandedIndex: null,
+      focusIndex: Math.floor(tree.children.length / 2)
+    }];
     initCards();
   })
   .catch(err => {
@@ -45,16 +47,30 @@ function renderEmpty(text) {
   treeRootEl.innerHTML = `<div class="empty">${escapeHtml(text)}</div>`;
 }
 
-// ========== 初始卡片渲染 ==========
+// ========== 环形位置计算 ==========
+// 返回 idx 相对于 focusIdx 的环形偏移量
+// 偶数时右侧多一张：leftCount = floor((N-1)/2), rightCount = N-1-leftCount
+function getCircularPosition(idx, focusIdx, N) {
+  if (N <= 1) return 0;
+  const rightCount = N - 1 - Math.floor((N - 1) / 2);
+  const cd = ((idx - focusIdx) % N + N) % N;
+  if (cd === 0) return 0;
+  if (cd <= rightCount) return cd;
+  return cd - N;
+}
+
+// ========== 初始卡片 ==========
 
 function initCards() {
   const container = treeRootEl;
   container.innerHTML = '';
 
-  state.levels[0].nodes.forEach((node, i) => {
+  const level = state.levels[0];
+  level.nodes.forEach((node, i) => {
     const el = createCardElement(node);
     el.dataset.level = '0';
     el.dataset.idx = String(i);
+    el.dataset.ringPos = '0';
     el.style.transition = 'none';
     el.style.transform = 'translateX(0px) scale(0.3)';
     el.style.opacity = '0';
@@ -70,7 +86,7 @@ function initCards() {
   });
 }
 
-// ========== 布局计算：所有层级共存 ==========
+// ========== 全局布局：所有层级共存 ==========
 
 function layoutAll() {
   const container = treeRootEl;
@@ -78,62 +94,62 @@ function layoutAll() {
   const containerW = container.clientWidth || 1200;
 
   state.levels.forEach((level, L) => {
-    const cards = container.querySelectorAll(`[data-level="${L}"]`);
-    const count = level.nodes.length;
-    if (count === 0) return;
-    const centerIdx = Math.floor(count / 2);
+    const cards = [...container.querySelectorAll(`[data-level="${L}"]`)];
+    const N = level.nodes.length;
+    if (N === 0) return;
+    const C = level.focusIndex;
+    const isActive = L === activeLevel;
 
-    if (L === activeLevel) {
-      // 活跃层：正常轮播布局
-      const spacing = Math.min(260, Math.max(140, (containerW * 0.7) / Math.max(count, 2)));
-      const scaleStep = 0.09;
+    const spacing = Math.min(260, Math.max(140, (containerW * 0.7) / Math.max(N, 2)));
 
-      cards.forEach(el => {
-        const idx = parseInt(el.dataset.idx);
-        const offset = idx - centerIdx;
-        const dist = Math.abs(offset);
+    cards.forEach(el => {
+      const idx = parseInt(el.dataset.idx);
+      const pos = getCircularPosition(idx, C, N);
+      const dist = Math.abs(pos);
+      const x = pos * spacing;
 
-        let hoverShift = 0;
-        if (state.hoveredKey === `${L}-${idx}` && offset !== 0) {
-          hoverShift = -offset * 35;
-        }
+      let scale, opacity, zIndex;
 
-        const x = offset * spacing + hoverShift;
-        const scale = Math.max(0.58, 1 - dist * scaleStep);
-        const zIndex = 100 - dist * 10 + (state.hoveredKey === `${L}-${idx}` ? 20 : 0);
-        const opacity = Math.max(0.3, 1 - dist * 0.2);
-
-        el.style.transform = `translateX(${x}px) scale(${scale})`;
-        el.style.zIndex = zIndex;
-        el.style.opacity = opacity;
+      if (isActive) {
+        scale = Math.max(0.6, 1 - dist * 0.09);
+        opacity = Math.max(0.35, 1 - dist * 0.18);
+        zIndex = 100 - dist * 10;
         el.style.pointerEvents = '';
         el.classList.remove('dimmed-parent');
-      });
-
-    } else {
-      // 父层：缩小、上移、半透明，保持可见作为上下文
-      const depthDiff = activeLevel - L;
-      const spacing = 55;
-
-      cards.forEach(el => {
-        const idx = parseInt(el.dataset.idx);
-        const offset = idx - centerIdx;
+      } else {
+        // 父层：保持同样的位置布局，仅略微缩小 + 变暗
+        scale = Math.max(0.52, (1 - dist * 0.09) * 0.88);
         const isExpanded = idx === level.expandedIndex;
-
-        const x = offset * spacing;
-        const y = -(170 + depthDiff * 25);
-        const scale = Math.max(0.14, 0.26 - depthDiff * 0.04);
-        const opacity = isExpanded ? 0.35 : 0.1;
-        const zIndex = 8 - depthDiff;
-
-        el.style.transform = `translateX(${x}px) translateY(${y}px) scale(${scale})`;
-        el.style.zIndex = zIndex;
-        el.style.opacity = opacity;
-        // 展开的那张卡片可点击（点击返回该层）
+        opacity = isExpanded ? 0.32 : 0.12;
+        zIndex = 15 - dist;
         el.style.pointerEvents = isExpanded ? '' : 'none';
-        el.classList.toggle('dimmed-parent', true);
-      });
-    }
+        el.classList.add('dimmed-parent');
+      }
+
+      // 环形换位检测：位置跳变超过半圈则瞬移
+      const oldPos = parseInt(el.dataset.ringPos || '0');
+      const isWrap = N > 2 && Math.abs(pos - oldPos) > Math.floor(N / 2);
+
+      if (isWrap) {
+        // 先隐藏、瞬移到新位置，再渐显
+        el.style.transition = 'none';
+        el.style.opacity = '0';
+        el.style.transform = `translateX(${x}px) scale(${scale})`;
+        el.style.zIndex = String(zIndex);
+        requestAnimationFrame(() => {
+          el.style.transition = '';
+          requestAnimationFrame(() => {
+            el.style.opacity = String(opacity);
+          });
+        });
+      } else {
+        el.style.transform = `translateX(${x}px) scale(${scale})`;
+        el.style.zIndex = String(zIndex);
+        el.style.opacity = String(opacity);
+      }
+
+      el.dataset.ringPos = String(pos);
+    });
   });
 }
 
@@ -147,10 +163,11 @@ function expandFolder(level, idx) {
   state.transitioning = true;
   const container = treeRootEl;
 
-  // 设置展开索引
+  // 设置父层状态
   state.levels[level].expandedIndex = idx;
+  state.levels[level].focusIndex = idx;
 
-  // 获取点击卡片的当前屏幕位置作为子卡片出发点
+  // 获取出发点（应该在中心，因为已被悬停）
   const clickedEl = container.querySelector(`[data-level="${level}"][data-idx="${idx}"]`);
   let originX = 0;
   if (clickedEl) {
@@ -159,16 +176,22 @@ function expandFolder(level, idx) {
     originX = (eRect.left + eRect.width / 2) - (cRect.left + cRect.width / 2);
   }
 
-  // 添加新层
+  // 创建新层
   const newLevelIdx = state.levels.length;
-  const newLevel = { nodes: folder.children, expandedIndex: null };
+  const children = folder.children;
+  const newLevel = {
+    nodes: children,
+    expandedIndex: null,
+    focusIndex: Math.floor(children.length / 2)
+  };
   state.levels.push(newLevel);
 
-  // 创建子卡片，全部从 originX 处开始
-  newLevel.nodes.forEach((node, i) => {
+  // 创建子卡片，从 originX 出发
+  children.forEach((node, i) => {
     const el = createCardElement(node);
     el.dataset.level = String(newLevelIdx);
     el.dataset.idx = String(i);
+    el.dataset.ringPos = '0';
     el.style.transition = 'none';
     el.style.transform = `translateX(${originX}px) scale(0.25)`;
     el.style.opacity = '0';
@@ -177,17 +200,14 @@ function expandFolder(level, idx) {
     bindCardEvents(el, node, newLevelIdx, i);
   });
 
-  // 动画：新卡片展开 + 父层缩小
+  // 动画
   requestAnimationFrame(() => {
     container.querySelectorAll(`[data-level="${newLevelIdx}"]`).forEach(el => {
       el.style.transition = '';
     });
-
     requestAnimationFrame(() => {
       layoutAll();
-
       setTimeout(() => {
-        // 清理临时 z-index
         container.querySelectorAll(`[data-level="${newLevelIdx}"]`).forEach(el => {
           el.style.zIndex = '';
         });
@@ -198,7 +218,7 @@ function expandFolder(level, idx) {
   });
 }
 
-// ========== 收起：回到指定层级 ==========
+// ========== 收起到指定层 ==========
 
 function collapseToLevel(targetLevel) {
   if (state.transitioning) return;
@@ -208,7 +228,7 @@ function collapseToLevel(targetLevel) {
   state.transitioning = true;
   const container = treeRootEl;
 
-  // 要移除的层级
+  // 子层卡片收缩消失
   for (let L = targetLevel + 1; L <= activeLevel; L++) {
     container.querySelectorAll(`[data-level="${L}"]`).forEach(el => {
       el.style.opacity = '0';
@@ -220,14 +240,11 @@ function collapseToLevel(targetLevel) {
   // 更新状态
   state.levels.length = targetLevel + 1;
   state.levels[targetLevel].expandedIndex = null;
-  state.hoveredKey = null;
 
-  // 父层卡片恢复到正常布局
+  // 父层恢复
   requestAnimationFrame(() => {
     layoutAll();
-
     setTimeout(() => {
-      // 移除被收起层的 DOM 元素
       for (let L = targetLevel + 1; L <= activeLevel; L++) {
         container.querySelectorAll(`[data-level="${L}"]`).forEach(el => el.remove());
       }
@@ -239,18 +256,11 @@ function collapseToLevel(targetLevel) {
 // ========== 事件绑定 ==========
 
 function bindCardEvents(el, node, level, idx) {
-  const container = treeRootEl;
-
+  // 悬停 → 轮盘旋转到该卡片为中心
   el.addEventListener('mouseenter', () => {
-    if (level === state.levels.length - 1) {
-      state.hoveredKey = `${level}-${idx}`;
-      layoutAll();
-    }
-  });
-
-  el.addEventListener('mouseleave', () => {
-    if (state.hoveredKey === `${level}-${idx}`) {
-      state.hoveredKey = null;
+    const currentActive = state.levels.length - 1;
+    if (level === currentActive && !state.transitioning) {
+      state.levels[level].focusIndex = idx;
       layoutAll();
     }
   });
@@ -259,16 +269,17 @@ function bindCardEvents(el, node, level, idx) {
     e.stopPropagation();
     if (state.transitioning) return;
 
-    const activeLevel = state.levels.length - 1;
+    const currentActive = state.levels.length - 1;
 
-    // 点击父层的卡片 → 收回到该层
-    if (level < activeLevel) {
+    // 点击父层 → 收回到该层
+    if (level < currentActive) {
       collapseToLevel(level);
       return;
     }
 
-    // 点击活跃层
+    // 活跃层
     if (node.type === 'folder') {
+      state.levels[level].focusIndex = idx;
       expandFolder(level, idx);
     } else {
       openFileModal(node);
@@ -278,7 +289,6 @@ function bindCardEvents(el, node, level, idx) {
 
 // ========== 全局事件 ==========
 
-// 点击空白区域 → 收回一层
 document.addEventListener('click', e => {
   if (state.transitioning) return;
   if (e.target.closest('.node-card') || e.target.closest('.modal')) return;
@@ -287,7 +297,6 @@ document.addEventListener('click', e => {
   }
 });
 
-// ESC → 收回一层
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     if (document.getElementById('file-modal')) return;
@@ -297,7 +306,7 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// ========== 创建卡片元素 ==========
+// ========== 创建卡片 ==========
 
 function createCardElement(node) {
   const nodeEl = document.createElement('div');
