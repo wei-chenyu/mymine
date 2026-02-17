@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --bg-0: #f5f5f5;
   --bg-1: #ffffff;
   --text: #1a1a2e;
@@ -41,13 +41,26 @@ body.custom-bg {
 
 /* ===== 头部区域 ===== */
 .top {
-  width: min(500px, 88vw);
+  width: fit-content;
+  max-width: calc(100vw - 24px);
   margin: 0 auto;
+  padding: clamp(8px, 1.2vw, 14px) clamp(12px, 1.8vw, 18px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   text-align: center;
+  border: none;
+  border-radius: 14px;
+  background: rgba(16, 20, 30, 0.46);
+  backdrop-filter: blur(12px) saturate(1.02);
+  -webkit-backdrop-filter: blur(12px) saturate(1.02);
+}
+
+.top .intro,
+.top #profile-content {
+  width: fit-content;
+  max-width: 100%;
 }
 
 .avatar-box {
@@ -83,6 +96,7 @@ body.custom-bg {
   margin: 0 0 2px;
   font-size: clamp(16px, 2vw, 21px);
   line-height: 1.2;
+  color: #fff;
 }
 
 .intro p {
@@ -93,9 +107,23 @@ body.custom-bg {
 }
 
 .profile-content {
-  color: var(--muted);
+  color: #fff;
   font-size: clamp(11px, 1.05vw, 13px);
   line-height: 1.4;
+}
+
+.profile-content a,
+.profile-content code {
+  color: #fff;
+}
+
+.profile-content p,
+.profile-content li,
+.profile-content blockquote,
+.profile-content strong,
+.profile-content em,
+.profile-content span {
+  color: #fff;
 }
 
 .profile-content p,
@@ -416,45 +444,48 @@ body.custom-bg {
   position: fixed;
   inset: 0;
   z-index: 10000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  display: block;
+  opacity: 1;
+  transition: none;
   pointer-events: none;
+  isolation: isolate;
 }
 
 .modal.visible {
-  opacity: 1;
   pointer-events: all;
 }
 
-.modal-backdrop {
+.modal::before {
+  content: "";
   position: absolute;
   inset: 0;
-  background: rgba(17, 22, 34, 0.22);
-  backdrop-filter: blur(16px) saturate(1.1);
-  -webkit-backdrop-filter: blur(16px) saturate(1.1);
+  z-index: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(16px) saturate(1.04);
+  -webkit-backdrop-filter: blur(16px) saturate(1.04);
 }
 
 .modal-content {
-  position: relative;
-  width: min(1400px, 96vw);
-  height: min(92vh, 980px);
+  position: absolute; /* 定位：详情面板容器 */
+  inset: 0; /* 定位：面板全屏铺满 */
+  z-index: 1;
+  width: 100vw;
+  height: 100vh;
   background: transparent;
   border-radius: 0;
   border: none;
   padding: 0;
-  overflow: visible;
+  overflow: hidden;
   box-shadow: none;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-  transform: scale(0.92) translateY(16px);
-  transition: transform 0.3s cubic-bezier(0.33, 0, 0.2, 1);
+  transform: none;
+  opacity: 0;
+  transition: opacity 0.24s ease;
 }
 
 .modal.visible .modal-content {
-  transform: scale(1) translateY(0);
+  opacity: 1;
 }
 
 .modal-close {
@@ -485,7 +516,7 @@ body.custom-bg {
   height: 100%;
   display: grid;
   grid-template-columns: minmax(420px, var(--left-pane-width, 1fr)) minmax(280px, 1fr);
-  gap: 12px;
+  gap: 0;
 }
 
 .modal-left,
@@ -494,9 +525,12 @@ body.custom-bg {
   min-height: 0;
   border-radius: 0;
   border: none;
-  background: transparent;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+  background: rgba(120, 126, 136, 0.08); /* 灰色深度：左右页局部灰度层 */
+  mix-blend-mode: color-burn; /* 混合模式：左右页也使用颜色加深 */
+  backdrop-filter: blur(6px) saturate(1); /* 虚化程度：左右页局部模糊 */
+  -webkit-backdrop-filter: blur(6px) saturate(1); /* Safari 同步 */
+  box-shadow: none;
+  outline: none;
 }
 
 .modal-left {
@@ -545,7 +579,7 @@ body.custom-bg {
 .modal-right-title {
   margin: 0 0 10px;
   font-size: 15px;
-  color: var(--text);
+  color: #eaf0ff;
 }
 
 .modal-grid {
@@ -624,10 +658,15 @@ body.custom-bg {
   border: none;
   border-radius: 0;
   padding: 0;
-  color: var(--muted);
-  line-height: 1.7;
+  color: #fff;
+  line-height: 1.78;
   font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
   text-align: left;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.85),
+    0 0 1px rgba(0, 0, 0, 0.7);
   transition: opacity 0.22s ease, transform 0.22s ease, filter 0.22s ease;
 }
 
@@ -641,6 +680,13 @@ body.custom-bg {
 }
 
 .modal-body p { margin: 0 0 16px; }
+
+.modal-body a {
+  color: #fff;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.85),
+    0 0 1px rgba(0, 0, 0, 0.7);
+}
 
 .modal-body h1,
 .modal-body h2,
@@ -698,15 +744,15 @@ body.custom-bg {
   }
 
   .modal-content {
-    width: 96vw;
-    height: 94vh;
-    padding: 12px;
+    width: 100vw;
+    height: 100vh;
+    padding: 0;
   }
 
   .modal-split {
     grid-template-columns: 1fr;
     grid-template-rows: 1.2fr 0.8fr;
-    gap: 10px;
+    gap: 0;
   }
 
   .modal-left,

@@ -581,7 +581,6 @@ function openFileModal(node) {
   modal.id = "file-modal";
   modal.className = "modal";
   modal.innerHTML = `
-    <div class="modal-backdrop"></div>
     <div class="modal-content">
       <div class="modal-split">
         <section class="modal-left">
@@ -669,7 +668,9 @@ function openFileModal(node) {
     if (!requestBackAction("modal")) closeModal();
   };
 
-  modal.querySelector(".modal-backdrop").addEventListener("click", requestCloseModal);
+  modal.addEventListener("click", e => {
+    if (e.target === modal) requestCloseModal();
+  });
   modal.querySelector(".modal-content").addEventListener("click", e => {
     const t = e.target;
     if (!(t instanceof Element)) return;
@@ -831,14 +832,28 @@ function pickDisplayNote(folder) {
 }
 
 function buildDetailBodyHtml(rawHtml, heroSrc) {
-  if (!heroSrc) return rawHtml;
-
   const wrap = document.createElement("div");
   wrap.innerHTML = rawHtml;
-  const normalizedHero = normalizePath(heroSrc);
-  const firstMatched = [...wrap.querySelectorAll("img")]
-    .find(img => normalizePath(img.getAttribute("src") || "") === normalizedHero);
-  if (firstMatched) firstMatched.remove();
+
+  if (heroSrc) {
+    const normalizedHero = normalizePath(heroSrc);
+    const firstMatched = [...wrap.querySelectorAll("img")]
+      .find(img => normalizePath(img.getAttribute("src") || "") === normalizedHero);
+    if (firstMatched) firstMatched.remove();
+  }
+
+  [...wrap.querySelectorAll("a[href]")].forEach(a => {
+    const href = (a.getAttribute("href") || "").trim();
+    const label = (a.textContent || "").trim();
+    const isWikiLink = Boolean(resolveLinkedNote(href) || (label && resolveLinkedNote(label)));
+    if (isWikiLink) a.remove();
+  });
+
+  [...wrap.querySelectorAll("p")].forEach(p => {
+    const hasRenderable = p.querySelector("img,video,iframe,pre,code,blockquote,ul,ol,table");
+    if (!hasRenderable && (p.textContent || "").trim().length === 0) p.remove();
+  });
+
   return wrap.innerHTML;
 }
 
