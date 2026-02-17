@@ -511,11 +511,13 @@ body.custom-bg {
   margin: 0 0 14px;
   color: var(--accent);
   font-size: clamp(24px, 2.8vw, 36px);
+  transition: opacity 0.22s ease, transform 0.22s ease, filter 0.22s ease;
 }
 
 .modal-hero {
   margin-bottom: 14px;
   text-align: left;
+  transition: opacity 0.22s ease, transform 0.22s ease, filter 0.22s ease;
 }
 
 .modal-hero img {
@@ -551,6 +553,7 @@ body.custom-bg {
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 12px;
   align-items: start;
+  transition: opacity 0.22s ease, transform 0.22s ease, filter 0.22s ease;
 }
 
 .right-entry {
@@ -625,6 +628,16 @@ body.custom-bg {
   line-height: 1.7;
   font-size: 16px;
   text-align: left;
+  transition: opacity 0.22s ease, transform 0.22s ease, filter 0.22s ease;
+}
+
+.modal.is-switching .modal-left-title,
+.modal.is-switching .modal-hero,
+.modal.is-switching .modal-body,
+.modal.is-switching .modal-grid {
+  opacity: 0.06;
+  transform: translateY(6px);
+  filter: blur(1px);
 }
 
 .modal-body p { margin: 0 0 16px; }

@@ -605,6 +605,8 @@ function openFileModal(node) {
   const bodyEl = modal.querySelector(".modal-body");
   const rightTitleEl = modal.querySelector(".modal-right-title");
   const gridEl = modal.querySelector(".modal-grid");
+  let isSwitching = false;
+  let switchTimer = null;
 
   const renderInModal = current => {
     state.activeFile = current.id;
@@ -619,7 +621,7 @@ function openFileModal(node) {
     const linked = getLinkedNotes(current);
     const sibling = getSiblingEntries(current);
     const entries = mergeLinkedAndSibling(linked, sibling);
-    rightTitleEl.textContent = "\u76f8\u5173\u4f5c\u54c1";
+    rightTitleEl.textContent = "\u76f8\u5173";
     gridEl.innerHTML = "";
 
     if (entries.length === 0) {
@@ -628,9 +630,22 @@ function openFileModal(node) {
     }
 
     entries.forEach(entry => {
-      const card = createRightEntryCard(entry, nextNode => renderInModal(nextNode));
+      const card = createRightEntryCard(entry, nextNode => switchInModal(nextNode));
       gridEl.appendChild(card);
     });
+  };
+
+  const switchInModal = nextNode => {
+    if (!nextNode || isSwitching || nextNode.id === state.activeFile) return;
+    isSwitching = true;
+    modal.classList.add("is-switching");
+    switchTimer = window.setTimeout(() => {
+      renderInModal(nextNode);
+      requestAnimationFrame(() => {
+        modal.classList.remove("is-switching");
+        isSwitching = false;
+      });
+    }, 120);
   };
 
   renderInModal(node);
@@ -643,6 +658,10 @@ function openFileModal(node) {
     modal.classList.remove("visible");
     setTimeout(() => modal.remove(), 300);
     state.activeFile = null;
+    if (switchTimer) {
+      clearTimeout(switchTimer);
+      switchTimer = null;
+    }
     if (handleEsc) document.removeEventListener("keydown", handleEsc);
   };
 
@@ -651,6 +670,14 @@ function openFileModal(node) {
   };
 
   modal.querySelector(".modal-backdrop").addEventListener("click", requestCloseModal);
+  modal.querySelector(".modal-content").addEventListener("click", e => {
+    const t = e.target;
+    if (!(t instanceof Element)) return;
+    if (t.closest("a,button,input,textarea,select,summary,details,img,video,iframe,pre,code,.right-entry")) return;
+    if (t.matches(".modal-content,.modal-split,.modal-left,.modal-right,.modal-hero,.modal-body,.modal-grid")) {
+      requestCloseModal();
+    }
+  });
 
   handleEsc = e => {
     if (e.key === "Escape") {
