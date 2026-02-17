@@ -572,8 +572,9 @@ function openFileModal(node) {
     bodyEl.innerHTML = buildDetailBodyHtml(current.html || "<p>空文档</p>", hero);
 
     const linked = getLinkedNotes(current);
-    const entries = linked.length > 0 ? linked : getSiblingEntries(current);
-    rightTitleEl.textContent = linked.length > 0 ? "双链入口" : "同级入口";
+    const sibling = getSiblingEntries(current);
+    const entries = mergeLinkedAndSibling(linked, sibling);
+    rightTitleEl.textContent = "相关作品";
     gridEl.innerHTML = "";
 
     if (entries.length === 0) {
@@ -610,6 +611,7 @@ function openFileModal(node) {
 function getLinkedNotes(noteNode) {
   const html = noteNode.html || "";
   const reg = /<a[^>]+href="([^"]+)"/g;
+  const obsidianReg = /\[\[([^\]]+)\]\]/g;
   const seen = new Set();
   const hits = [];
   let m;
@@ -617,6 +619,15 @@ function getLinkedNotes(noteNode) {
   while ((m = reg.exec(html)) !== null) {
     const raw = (m[1] || "").split("#")[0].split("?")[0];
     const hit = resolveLinkedNote(raw);
+    if (!hit || hit.id === noteNode.id || seen.has(hit.id)) continue;
+    seen.add(hit.id);
+    hits.push({ node: hit, type: "note" });
+  }
+
+  const rawText = noteNode.textContent || "";
+  while ((m = obsidianReg.exec(rawText)) !== null) {
+    const inner = (m[1] || "").split("|")[0].trim();
+    const hit = resolveLinkedNote(inner);
     if (!hit || hit.id === noteNode.id || seen.has(hit.id)) continue;
     seen.add(hit.id);
     hits.push({ node: hit, type: "note" });
@@ -630,7 +641,9 @@ function resolveLinkedNote(rawHref) {
   if (!normalized) return null;
 
   const candidates = new Set();
+  candidates.add(rawHref);
   candidates.add(normalized);
+  candidates.add(encodeURI(normalized));
   candidates.add(normalized.replace(/^\.\//, ""));
   candidates.add(normalized.replace(/^content\//, ""));
   if (!normalized.endsWith(".md")) {
@@ -647,6 +660,25 @@ function resolveLinkedNote(rawHref) {
   const base = normalizePath(normalized.split("/").pop() || "").replace(/\.md$/i, "");
   if (base && state.noteByBasename.has(base)) return state.noteByBasename.get(base);
   return null;
+}
+
+function mergeLinkedAndSibling(linked, sibling) {
+  const out = [];
+  const seen = new Set();
+
+  linked.forEach(item => {
+    if (!item || !item.node || seen.has(item.node.id)) return;
+    seen.add(item.node.id);
+    out.push(item);
+  });
+
+  sibling.forEach(item => {
+    if (!item || !item.node || seen.has(item.node.id)) return;
+    seen.add(item.node.id);
+    out.push(item);
+  });
+
+  return out;
 }
 
 function getSiblingEntries(noteNode) {
