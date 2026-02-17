@@ -547,18 +547,19 @@ body.custom-bg {
 }
 
 .modal-grid {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 12px;
+  align-items: start;
 }
 
 .right-entry {
   width: 100%;
   max-width: none;
-  display: grid;
-  grid-template-columns: 88px minmax(0, 1fr);
-  gap: 10px;
-  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.4);
@@ -581,8 +582,9 @@ body.custom-bg {
 }
 
 .right-entry-cover {
-  width: 88px;
-  height: 116px;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  height: auto;
   border-radius: 8px;
   object-fit: cover;
   display: block;
@@ -599,12 +601,12 @@ body.custom-bg {
 .right-entry-title {
   margin-top: 0;
   color: var(--text);
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.28;
-  max-width: none;
-  white-space: nowrap;
+  max-width: 100%;
+  white-space: normal;
   overflow: hidden;
-  text-overflow: ellipsis;
+  word-break: break-word;
 }
 
 .modal-grid-empty {
@@ -702,21 +704,11 @@ body.custom-bg {
   }
 
   .modal-grid {
-    display: flex;
-    flex-direction: column;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   }
 
   .right-entry {
-    grid-template-columns: 76px minmax(0, 1fr);
-  }
-
-  .right-entry-cover {
-    width: 76px;
-    height: 102px;
-  }
-
-  .right-entry-title {
-    max-width: none;
+    gap: 7px;
   }
 }
 
@@ -748,7 +740,6 @@ body.custom-bg {
   }
 
   .modal-grid {
-    display: flex;
-    flex-direction: column;
+    grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
   }
 }
