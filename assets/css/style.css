@@ -1,11 +1,11 @@
 :root {
-  --bg-0: #061327;
-  --bg-1: #0a1f3c;
-  --text: #e8edf7;
-  --muted: #8da2c5;
-  --card: #173a63;
-  --card-border: rgba(154, 205, 255, 0.28);
-  --accent: #66c8ff;
+  --bg-0: #f5f5f5;
+  --bg-1: #ffffff;
+  --text: #1a1a2e;
+  --muted: #5a6478;
+  --card: #ffffff;
+  --card-border: rgba(0, 0, 0, 0.1);
+  --accent: #2b6cb0;
 }
 
 * { box-sizing: border-box; }
@@ -15,10 +15,16 @@ body {
   min-height: 100vh;
   color: var(--text);
   font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-  background:
-    radial-gradient(80rem 32rem at 8% -8%, #12315d 0%, transparent 58%),
-    linear-gradient(165deg, var(--bg-0) 0%, var(--bg-1) 100%);
+  background: #fff;
   overflow-x: hidden;
+}
+
+body.custom-bg {
+  background-image: url("../../background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
 }
 
 .page {
@@ -29,21 +35,23 @@ body {
 
 /* ===== 头部区域 ===== */
 .top {
-  width: min(980px, 92vw);
+  width: min(500px, 88vw);
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: 180px 1fr;
-  gap: 18px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  gap: 8px;
+  text-align: center;
 }
 
 .avatar-box {
-  width: 180px;
-  height: 180px;
-  border-radius: 26px;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
   overflow: hidden;
-  border: 1px solid var(--card-border);
-  background: #081428;
+  border: 2px solid var(--card-border);
+  background: #eee;
+  flex-shrink: 0;
 }
 
 .avatar-box img {
@@ -52,30 +60,36 @@ body {
   object-fit: cover;
 }
 
+.intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .eyebrow {
-  margin: 0 0 6px;
+  margin: 0 0 4px;
   color: var(--accent);
   letter-spacing: 0.14em;
-  font-size: 20px;
+  font-size: 14px;
 }
 
 .intro h1 {
-  margin: 0 0 8px;
-  font-size: clamp(22px, 3.2vw, 36px);
-  line-height: 1;
+  margin: 0 0 2px;
+  font-size: clamp(16px, 2vw, 21px);
+  line-height: 1.2;
 }
 
 .intro p {
   margin: 0;
   color: var(--muted);
-  font-size: clamp(18px, 2.2vw, 32px);
-  line-height: 1.28;
+  font-size: clamp(13px, 1.6vw, 16px);
+  line-height: 1.3;
 }
 
 .profile-content {
   color: var(--muted);
-  font-size: clamp(15px, 1.45vw, 21px);
-  line-height: 1.45;
+  font-size: clamp(11px, 1.05vw, 13px);
+  line-height: 1.4;
 }
 
 .profile-content p,
@@ -88,31 +102,31 @@ body {
 .profile-content ul,
 .profile-content ol,
 .profile-content blockquote {
-  margin: 0 0 10px;
+  margin: 0 0 6px;
 }
 
 .profile-content code {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 6px;
-  padding: 2px 6px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 4px;
+  padding: 1px 5px;
 }
 
 .profile-content img,
 .profile-content video {
   max-width: 100%;
-  border-radius: 10px;
+  border-radius: 8px;
   border: 1px solid var(--card-border);
 }
 
 /* ===== 父层卡片（缩小后可点击返回） ===== */
 .node.dimmed-parent .node-card {
   cursor: pointer;
-  filter: brightness(0.7) saturate(0.5);
+  filter: brightness(0.75) saturate(0.5);
 }
 
 /* ===== 卡片容器区域 ===== */
 .cards-root {
-  margin-top: 18px;
+  margin-top: 14px;
   min-height: 520px;
 }
 
@@ -147,7 +161,7 @@ body {
   border-radius: 16px;
   overflow: visible;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   transition:
     transform 0.35s cubic-bezier(0.33, 0, 0.2, 1),
     box-shadow 0.35s ease;
@@ -155,7 +169,7 @@ body {
 
 .node-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
 }
 
 /* 标题遮罩 */
@@ -165,8 +179,8 @@ body {
   left: 0;
   right: 0;
   padding: 14px 16px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 10%, transparent);
-  color: var(--text);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 10%, transparent);
+  color: #fff;
   font-size: clamp(15px, 1.6vw, 20px);
   font-weight: 600;
   z-index: 10;
@@ -178,6 +192,7 @@ body {
   position: relative;
   width: 100%;
   height: 100%;
+  transition: transform 0.28s cubic-bezier(0.33, 0, 0.2, 1);
 }
 
 /* 文件夹耳朵 */
@@ -187,7 +202,7 @@ body {
   left: 14px;
   width: 64px;
   height: 20px;
-  background: linear-gradient(165deg, #2a6090, #1d4f78);
+  background: linear-gradient(165deg, #e0e4ea, #c8ced8);
   border-radius: 7px 7px 0 0;
   border: 1px solid var(--card-border);
   border-bottom: none;
@@ -202,8 +217,21 @@ body {
   border-radius: 16px;
   overflow: hidden;
   border: 1.5px solid var(--card-border);
-  background: linear-gradient(165deg, #1b4677, var(--card));
+  background: linear-gradient(165deg, #f0f2f5, #e6e9ee);
   z-index: 3;
+  transition:
+    border-color 0.28s ease,
+    transform 0.28s cubic-bezier(0.33, 0, 0.2, 1);
+}
+
+/* 文件夹悬停：边框微微变亮 + 微微张开（通过 cover 上移） */
+.node-card:hover .folder-body {
+  border-color: rgba(0, 0, 0, 0.12);
+  transform: scale(1.015) translateY(-2px);
+}
+
+.node-card:hover .folder-tab {
+  background: linear-gradient(165deg, #d4dae4, #bcc4d0);
 }
 
 /* 文件夹内图像堆叠 */
@@ -229,50 +257,54 @@ body {
   z-index: 3;
 }
 
-/* 其他图层堆叠在后方 */
+/* 其他图层堆叠在后方（默认紧凑） */
 .stack-layer:not(.cover):nth-child(2) {
   z-index: 2;
-  transform: translate(-5px, -6px) rotate(-2deg);
-  opacity: 0.8;
+  transform: translate(-3px, -4px) rotate(-1.5deg);
+  opacity: 0.85;
 }
 
 .stack-layer:not(.cover):nth-child(3) {
   z-index: 1;
-  transform: translate(5px, -12px) rotate(2.5deg);
-  opacity: 0.65;
+  transform: translate(3px, -8px) rotate(1.5deg);
+  opacity: 0.7;
 }
 
 .stack-layer:not(.cover):nth-child(4) {
   z-index: 0;
-  transform: translate(-7px, -18px) rotate(-3.5deg);
-  opacity: 0.5;
+  transform: translate(-5px, -12px) rotate(-2.5deg);
+  opacity: 0.55;
 }
 
 .stack-layer:not(.cover):nth-child(5) {
   z-index: -1;
-  transform: translate(8px, -24px) rotate(4deg);
-  opacity: 0.4;
+  transform: translate(5px, -16px) rotate(3deg);
+  opacity: 0.45;
 }
 
-/* 悬停：堆叠图像展开散开 */
+/* 悬停：堆叠图像微微展开（轻度散开） */
+.node-card:hover .stack-layer.cover {
+  transform: translateY(-3px);
+}
+
 .node-card:hover .stack-layer:not(.cover):nth-child(2) {
-  transform: translate(-20px, -16px) rotate(-5deg);
-  opacity: 0.92;
+  transform: translate(-10px, -10px) rotate(-3deg);
+  opacity: 0.9;
 }
 
 .node-card:hover .stack-layer:not(.cover):nth-child(3) {
-  transform: translate(20px, -32px) rotate(5deg);
-  opacity: 0.85;
+  transform: translate(10px, -18px) rotate(3deg);
+  opacity: 0.82;
 }
 
 .node-card:hover .stack-layer:not(.cover):nth-child(4) {
-  transform: translate(-24px, -48px) rotate(-7deg);
-  opacity: 0.78;
+  transform: translate(-14px, -26px) rotate(-5deg);
+  opacity: 0.72;
 }
 
 .node-card:hover .stack-layer:not(.cover):nth-child(5) {
-  transform: translate(26px, -60px) rotate(8deg);
-  opacity: 0.7;
+  transform: translate(14px, -34px) rotate(5deg);
+  opacity: 0.65;
 }
 
 /* 文件夹底部装饰线 */
@@ -283,7 +315,7 @@ body {
   left: 14px;
   right: 14px;
   height: 1px;
-  background: rgba(154, 205, 255, 0.1);
+  background: rgba(0, 0, 0, 0.06);
   z-index: 5;
   pointer-events: none;
 }
@@ -292,14 +324,14 @@ body {
 .placeholder-bg {
   width: 100%;
   height: 100%;
-  background: linear-gradient(165deg, #1b4677, var(--card));
+  background: linear-gradient(165deg, #f0f2f5, #e6e9ee);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .folder-icon-inner {
-  opacity: 0.15;
+  opacity: 0.12;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -334,7 +366,7 @@ body {
   width: 100%;
   height: 100%;
   padding: 20px;
-  background: linear-gradient(165deg, #1b4677, var(--card));
+  background: linear-gradient(165deg, #f8f9fb, #eef0f4);
   color: var(--text);
   font-size: clamp(13px, 1.4vw, 17px);
   line-height: 1.6;
@@ -349,7 +381,7 @@ body {
   left: 0;
   right: 0;
   height: 80px;
-  background: linear-gradient(to top, var(--card), transparent);
+  background: linear-gradient(to top, #eef0f4, transparent);
   pointer-events: none;
 }
 
@@ -370,7 +402,7 @@ body {
   margin: 8px 0;
 }
 
-/* ===== 模态框（仅查看文件内容） ===== */
+/* ===== 模态框 ===== */
 .modal {
   position: fixed;
   inset: 0;
@@ -391,7 +423,7 @@ body {
 .modal-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(8px);
 }
 
@@ -399,12 +431,12 @@ body {
   position: relative;
   max-width: min(800px, 90vw);
   max-height: 90vh;
-  background: var(--bg-1);
+  background: #fff;
   border-radius: 20px;
   border: 1px solid var(--card-border);
   padding: 40px;
   overflow-y: auto;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
   transform: scale(0.92) translateY(16px);
   transition: transform 0.3s cubic-bezier(0.33, 0, 0.2, 1);
 }
@@ -426,7 +458,7 @@ body {
   width: 38px;
   height: 38px;
   border: none;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.06);
   color: var(--text);
   font-size: 22px;
   border-radius: 50%;
@@ -435,7 +467,7 @@ body {
 }
 
 .modal-close:hover {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(0, 0, 0, 0.12);
 }
 
 .modal-body {
@@ -463,14 +495,14 @@ body {
 }
 
 .modal-body code {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.05);
   border-radius: 6px;
   padding: 2px 6px;
   font-family: "Consolas", "Monaco", monospace;
 }
 
 .modal-body pre {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.04);
   border-radius: 8px;
   padding: 16px;
   overflow-x: auto;
@@ -489,14 +521,9 @@ body {
 
 /* ===== 响应式 ===== */
 @media (max-width: 860px) {
-  .top {
-    grid-template-columns: 132px 1fr;
-  }
-
   .avatar-box {
-    width: 132px;
-    height: 132px;
-    border-radius: 20px;
+    width: 72px;
+    height: 72px;
   }
 
   .node {
@@ -509,6 +536,11 @@ body {
 }
 
 @media (max-width: 480px) {
+  .avatar-box {
+    width: 58px;
+    height: 58px;
+  }
+
   .node {
     width: 150px;
   }
@@ -529,5 +561,4 @@ body {
     top: -9px;
     border-radius: 5px 5px 0 0;
   }
-
 }

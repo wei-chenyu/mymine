@@ -7,12 +7,17 @@ if (avatarEl) {
   avatarEl.onerror = () => { avatarEl.src = "assets/img/avatar-fallback.svg"; };
 }
 
+const HOVER_DELAY = 520; // 悬停多久后才旋转（毫秒）
+const HOVER_COOLDOWN = 420; // 切换后冷却周期，避免过快连续跳转
+let hoverTimer = null;
+
 const state = {
   tree: {},
   // 层级栈：每层 { nodes, expandedIndex, focusIndex }
   levels: [],
   transitioning: false,
-  activeFile: null
+  activeFile: null,
+  hoverLockedUntil: 0
 };
 
 // ========== 初始化 ==========
@@ -20,6 +25,7 @@ const state = {
 fetch("assets/data/manifest.json", { cache: "no-cache" })
   .then(r => r.json())
   .then(tree => {
+    applyCustomBackgroundIfExists();
     if (tree.profile) renderProfile(tree.profile);
     if (!tree.children || tree.children.length === 0) {
       renderEmpty("暂无内容，请在 content 里添加文件夹或 Markdown。");
@@ -256,13 +262,25 @@ function collapseToLevel(targetLevel) {
 // ========== 事件绑定 ==========
 
 function bindCardEvents(el, node, level, idx) {
-  // 悬停 → 轮盘旋转到该卡片为中心
+  // 悬停 → 延迟后轮盘旋转到该卡片为中心
   el.addEventListener('mouseenter', () => {
     const currentActive = state.levels.length - 1;
     if (level === currentActive && !state.transitioning) {
-      state.levels[level].focusIndex = idx;
-      layoutAll();
+      if (Date.now() < state.hoverLockedUntil) return;
+      clearTimeout(hoverTimer);
+      hoverTimer = setTimeout(() => {
+        if (Date.now() < state.hoverLockedUntil) return;
+        if (state.levels[level] && state.levels[level].focusIndex !== idx) {
+          state.levels[level].focusIndex = idx;
+          layoutAll();
+          state.hoverLockedUntil = Date.now() + HOVER_COOLDOWN;
+        }
+      }, HOVER_DELAY);
     }
+  });
+
+  el.addEventListener('mouseleave', () => {
+    clearTimeout(hoverTimer);
   });
 
   el.querySelector('.node-card').addEventListener('click', e => {
@@ -482,4 +500,12 @@ function escapeHtml(text) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
+}
+
+function applyCustomBackgroundIfExists() {
+  const img = new Image();
+  img.onload = () => {
+    document.body.classList.add("custom-bg");
+  };
+  img.src = "background.jpg";
 }
