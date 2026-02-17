@@ -3,7 +3,7 @@
   "title": "content",
   "profile": {
     "title": "个人简介",
-    "html": "<p>你好，我是你的名字。</p>\n<ul>\n<li>方向：视觉设计 / 前端 / 插画（自行改）</li>\n<li>工具：Obsidian、GitHub、Figma（自行改）</li>\n<li>目标：把作品整理成可持续更新的作品库</li>\n</ul>\n<p>你可以直接在这里写 Obsidian 语法：</p>\n<ul>\n<li>双链：<a href=\"content/%E7%A4%BA%E4%BE%8B%E7%AC%94%E8%AE%B0.md\">查看示例笔记</a></li>\n<li>图片嵌入：<img src=\"media/avatar.png\" alt=\"avatar.png\"></li>\n</ul>\n<p>只要运行 <code>node scripts/build-manifest.js</code>，页面简介区会自动更新。</p>\n"
+    "html": "<p>一种古老而通天彻地的童年期狂妄。</p>\n"
   },
   "children": [
     {
