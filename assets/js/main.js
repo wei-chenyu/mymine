@@ -1,4 +1,4 @@
-const avatarEl = document.getElementById("avatar");
+﻿const avatarEl = document.getElementById("avatar");
 const profileTitleEl = document.getElementById("profile-title");
 const profileContentEl = document.getElementById("profile-content");
 const treeRootEl = document.getElementById("tree-root");
@@ -539,7 +539,7 @@ function openFileModal(node) {
   modal.innerHTML = `
     <div class="modal-backdrop"></div>
     <div class="modal-content">
-      <button class="modal-close">✕</button>
+      <button class="modal-close">&times;</button>
       <div class="modal-split">
         <section class="modal-left">
           <h2 class="modal-left-title"></h2>
@@ -569,16 +569,16 @@ function openFileModal(node) {
     const hero = (current.images && current.images[0]) || "";
     heroEl.innerHTML = hero ? `<img src="${hero}" alt="${escapeHtml(current.title || "")}" />` : "";
     heroEl.classList.toggle("is-empty", !hero);
-    bodyEl.innerHTML = buildDetailBodyHtml(current.html || "<p>空文档</p>", hero);
+    bodyEl.innerHTML = buildDetailBodyHtml(current.html || "<p>\u7a7a\u6587\u6863</p>", hero);
 
     const linked = getLinkedNotes(current);
     const sibling = getSiblingEntries(current);
     const entries = mergeLinkedAndSibling(linked, sibling);
-    rightTitleEl.textContent = "相关作品";
+    rightTitleEl.textContent = "\u76f8\u5173\u4f5c\u54c1";
     gridEl.innerHTML = "";
 
     if (entries.length === 0) {
-      gridEl.innerHTML = '<div class="modal-grid-empty">暂无可跳转内容</div>';
+      gridEl.innerHTML = '<div class="modal-grid-empty">\u6682\u65e0\u53ef\u8df3\u8f6c\u5185\u5bb9</div>';
       return;
     }
 
@@ -710,7 +710,7 @@ function createRightEntryCard(entry, onOpen) {
   } else {
     const ph = document.createElement("div");
     ph.className = "right-entry-cover right-entry-placeholder";
-    ph.textContent = entry.type === "folder" ? "文件夹" : "笔记";
+    ph.textContent = entry.type === "folder" ? "\u6587\u4ef6\u5939" : "\u7b14\u8bb0";
     el.appendChild(ph);
   }
 
@@ -779,3 +779,4 @@ function applyCustomBackgroundIfExists() {
   };
   img.src = "background.jpg";
 }
+
