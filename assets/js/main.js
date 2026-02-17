@@ -612,7 +612,9 @@ function openFileModal(node) {
     const hero = (current.images && current.images[0]) || "";
     heroEl.innerHTML = hero ? `<img class="modal-hero-img" src="${hero}" alt="${escapeHtml(current.title || "")}" />` : "";
     heroEl.classList.toggle("is-empty", !hero);
-    bodyEl.innerHTML = buildDetailBodyHtml(current.html || "<p>\\u7a7a\\u6587\\u6863</p>", hero);`r`n    updateBodyVisibility(bodyEl);`r`n    syncBodyWidthToHero(modal);
+    bodyEl.innerHTML = buildDetailBodyHtml(current.html || "<p>\\u7a7a\\u6587\\u6863</p>", hero);
+    updateBodyVisibility(bodyEl);
+    syncBodyWidthToHero(modal);
 
     const linked = getLinkedNotes(current);
     const sibling = getSiblingEntries(current);
