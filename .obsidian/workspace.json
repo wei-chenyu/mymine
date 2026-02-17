@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "content/一级1/二级1/二级文件.md",
+                "file": "content/一级3/未命名.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "二级文件"
+              "title": "未命名"
             }
           }
         ]
@@ -183,22 +183,23 @@
       "bases:新建数据库": false
     }
   },
-  "active": "92c0ac730be54bf8",
+  "active": "fb0701b539b78951",
   "lastOpenFiles": [
+    "content/一级3/s.jpg",
+    "content/一级3/未命名.md",
+    "content/一级2/陵湍.png",
+    "content/一级2/？.md",
     "content/一级1/封面.md",
+    "content/一级1/串门.md",
+    "content/一级1/白旬.jpg",
+    "content/一级1/二级1/二级文件.md",
     "background.jpg",
     "background (2).jpg",
     "H`IYCG1{NTENA1`D`]08SDN.jpg",
     "backgroun.jpg",
     "backgrounc.jpg",
-    "content/一级1/串门.md",
-    "content/一级2/陵湍.png",
     "content/一级3/e.jpg",
     "content/一级3/vc.md",
-    "content/一级3/二级3/未命名.md",
-    "content/一级2/？.md",
-    "content/一级1/二级1/二级文件.md",
-    "content/一级1/白旬.jpg",
     "V604P[7RN[Z0LRZI`31NY~7.jpg",
     "assets/css/style.css.tmp.5248.1771293919852",
     "assets/js/main.js.tmp.5248.1771293860833",
@@ -210,7 +211,6 @@
     "index.html.tmp.5248.1771292786438",
     "assets/css/style.css.tmp.5248.1771292781534",
     "assets/css/style.css.tmp.5248.1771292773125",
-    "content/一级3/二级3/s.jpg",
     "content/一级1/一级文件.md",
     "profile.md",
     "node_modules/marked/README.md",
