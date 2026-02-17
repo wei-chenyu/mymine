@@ -543,7 +543,7 @@ body.custom-bg {
 
 .modal-left-title {
   margin: 0 0 14px;
-  color: var(--accent);
+  color: #fff;
   font-size: clamp(24px, 2.8vw, 36px);
   transition: opacity 0.22s ease, transform 0.22s ease, filter 0.22s ease;
 }
