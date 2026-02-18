@@ -155,7 +155,7 @@ body.custom-bg {
 /* ===== 父层卡片（缩小后可点击返回） ===== */
 .node.dimmed-parent .node-card {
   cursor: pointer;
-  filter: brightness(0.75) saturate(0.5);
+  filter: brightness(0.78) saturate(0.58) blur(1.2px);
 }
 
 /* ===== 卡片容器区域 ===== */
@@ -622,10 +622,10 @@ body.custom-bg {
 
 .modal-hero img {
   width: auto;
-  max-height: 40vh;
+  max-height: 46vh;
   max-width: 100%;
   object-fit: initial;
-  border-radius: 14px;
+  border-radius: 9px;
   border: 1px solid var(--card-border);
   display: block;
   margin: 0 auto 0 0;

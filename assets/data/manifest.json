@@ -16,6 +16,7 @@
           "type": "note",
           "title": "串门",
           "summary": "",
+          "showTitle": true,
           "html": "<p><img src=\"content/%E4%B8%80%E7%BA%A73/e.jpg\" alt=\"e.jpg\"></p>\n",
           "images": [
             "content/%E4%B8%80%E7%BA%A73/e.jpg"
@@ -27,6 +28,7 @@
           "type": "note",
           "title": "封面",
           "summary": "",
+          "showTitle": false,
           "html": "<p><img src=\"content/%E4%B8%80%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg\" alt=\"白旬.jpg\">\n这是分割\n<a href=\"%EF%BC%9F\">？</a></p>\n",
           "images": [
             "content/%E4%B8%80%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg"
@@ -50,6 +52,7 @@
           "type": "note",
           "title": "？",
           "summary": "",
+          "showTitle": true,
           "html": "<p><img src=\"content/%E4%B8%80%E7%BA%A72/%E9%99%B5%E6%B9%8D.png\" alt=\"陵湍.png\"></p>\n",
           "images": [
             "content/%E4%B8%80%E7%BA%A72/%E9%99%B5%E6%B9%8D.png"
@@ -80,6 +83,7 @@
           "type": "note",
           "title": "未命名",
           "summary": "",
+          "showTitle": true,
           "html": "<p><img src=\"content/%E4%B8%80%E7%BA%A73/s.jpg\" alt=\"s.jpg\"></p>\n",
           "images": [
             "content/%E4%B8%80%E7%BA%A73/s.jpg"
@@ -91,6 +95,7 @@
           "type": "note",
           "title": "vc",
           "summary": "",
+          "showTitle": true,
           "html": "<p><img src=\"content/%E4%B8%80%E7%BA%A73/e.jpg\" alt=\"e.jpg\"></p>\n",
           "images": [
             "content/%E4%B8%80%E7%BA%A73/e.jpg"

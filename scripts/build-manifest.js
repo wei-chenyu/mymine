@@ -174,9 +174,14 @@ function parseMarkdown(raw, currentDirRel, contentFileSet, repoFileSet, repoBase
   const { content, data } = matter(raw);
   const normalized = obsidianToMarkdown(content, currentDirRel, contentFileSet, repoFileSet, repoBasenameIndex);
   const html = marked.parse(normalized);
+  const rawShowTitle = data["标题"];
+  const showTitle = typeof rawShowTitle === "boolean"
+    ? rawShowTitle
+    : String(rawShowTitle || "").trim().toLowerCase() !== "false";
   return {
     title: data.title || "",
     summary: data.summary || "",
+    showTitle,
     html: html,
     images: extractImages(html),
     textContent: content.slice(0, 200)
@@ -233,6 +238,7 @@ async function walk(dir, contentFileSet, repoFileSet, repoBasenameIndex, base = 
         type: "note",
         title: parsed.title || e.name.replace(/\.md$/, ""),
         summary: parsed.summary || "",
+        showTitle: parsed.showTitle,
         html: parsed.html,
         images: parsed.images,
         textContent: parsed.textContent

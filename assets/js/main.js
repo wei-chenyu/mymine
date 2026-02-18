@@ -256,10 +256,10 @@ function layoutAll() {
         el.style.pointerEvents = '';
         el.classList.remove('dimmed-parent');
       } else {
-        // 父层：保持同样的位置布局，仅略微缩小 + 变暗
-        scale = Math.max(0.52, (1 - dist * 0.09) * 0.88);
+        // 父层：保留可见性，仅轻微缩小 + 轻度变暗
+        scale = Math.max(0.54, (1 - dist * 0.09) * 0.9);
         const isExpanded = idx === level.expandedIndex;
-        opacity = isExpanded ? 0.32 : 0.12;
+        opacity = isExpanded ? 0.46 : 0.24;
         zIndex = 15 - dist;
         el.style.pointerEvents = isExpanded ? '' : 'none';
         el.classList.add('dimmed-parent');
@@ -485,13 +485,20 @@ function createCardElement(node) {
     cardEl.appendChild(createNoteVisual(node));
   }
 
-  const titleEl = document.createElement('div');
-  titleEl.className = 'node-title';
-  titleEl.textContent = node.title;
-  cardEl.appendChild(titleEl);
+  if (shouldShowTitle(node)) {
+    const titleEl = document.createElement('div');
+    titleEl.className = 'node-title';
+    titleEl.textContent = node.title;
+    cardEl.appendChild(titleEl);
+  }
 
   nodeEl.appendChild(cardEl);
   return nodeEl;
+}
+
+function shouldShowTitle(node) {
+  if (!node || node.type !== "note") return true;
+  return node.showTitle !== false;
 }
 
 // ========== 文件夹视觉 ==========
@@ -687,7 +694,9 @@ function openFileModal(node) {
 
   const renderInModal = current => {
     state.activeFile = current.id;
-    titleEl.textContent = current.title || "";
+    const showTitle = shouldShowTitle(current);
+    titleEl.textContent = showTitle ? (current.title || "") : "";
+    titleEl.style.display = showTitle ? "" : "none";
     const hero = (current.images && current.images[0]) || "";
     heroEl.innerHTML = hero ? `<img class="modal-hero-img" src="${hero}" alt="${escapeHtml(current.title || "")}" />` : "";
     heroEl.classList.toggle("is-empty", !hero);
@@ -698,7 +707,7 @@ function openFileModal(node) {
     const linked = getLinkedNotes(current);
     const sibling = getSiblingEntries(current);
     const entries = mergeLinkedAndSibling(linked, sibling);
-    rightTitleEl.textContent = "\u76f8\u5173";
+    rightTitleEl.textContent = "\u901a\u5f80";
     gridEl.innerHTML = "";
 
     if (entries.length === 0) {
