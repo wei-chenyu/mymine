@@ -885,7 +885,12 @@ function createRightEntryCard(entry, onOpen) {
 
   const title = document.createElement("div");
   title.className = "right-entry-title";
-  title.textContent = entry.node.title || "";
+  if (shouldShowTitle(entry.node)) {
+    title.textContent = entry.node.title || "";
+  } else {
+    title.textContent = "";
+    title.style.display = "none";
+  }
   el.appendChild(title);
 
   if (targetNode) {

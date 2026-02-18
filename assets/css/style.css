@@ -659,18 +659,18 @@ body.custom-bg {
 .right-entry {
   width: 100%;
   max-width: none;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  align-items: flex-start;
+  display: block;
+  position: relative;
+  aspect-ratio: 3 / 4;
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
-  padding: 8px;
+  padding: 0;
   text-align: left;
   cursor: pointer;
+  overflow: hidden;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -686,9 +686,8 @@ body.custom-bg {
 
 .right-entry-cover {
   width: 100%;
-  aspect-ratio: 3 / 4;
-  height: auto;
-  border-radius: 8px;
+  height: 100%;
+  border-radius: 0;
   object-fit: cover;
   display: block;
 }
@@ -702,14 +701,18 @@ body.custom-bg {
 }
 
 .right-entry-title {
-  margin-top: 0;
-  color: var(--text);
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 10px 10px 9px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 10%, transparent);
+  color: #fff;
   font-size: 13px;
   line-height: 1.28;
-  max-width: 100%;
-  white-space: normal;
+  white-space: nowrap;
   overflow: hidden;
-  word-break: break-word;
+  text-overflow: ellipsis;
 }
 
 .modal-grid-empty {

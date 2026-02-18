@@ -28,7 +28,7 @@
           "type": "note",
           "title": "封面",
           "summary": "",
-          "showTitle": false,
+          "showTitle": true,
           "html": "<p><img src=\"content/%E4%B8%80%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg\" alt=\"白旬.jpg\">\n这是分割\n<a href=\"%EF%BC%9F\">？</a></p>\n",
           "images": [
             "content/%E4%B8%80%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg"
