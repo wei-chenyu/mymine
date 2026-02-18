@@ -177,7 +177,7 @@ function parseMarkdown(raw, currentDirRel, contentFileSet, repoFileSet, repoBase
   const rawShowTitle = data["标题"];
   const showTitle = typeof rawShowTitle === "boolean"
     ? rawShowTitle
-    : String(rawShowTitle || "").trim().toLowerCase() !== "false";
+    : String(rawShowTitle || "").trim().toLowerCase() === "true";
   return {
     title: data.title || "",
     summary: data.summary || "",
