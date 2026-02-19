@@ -1416,6 +1416,45 @@
                   "coverImage": null
                 },
                 {
+                  "id": "画/原创/流淌着的/蓝橙 诡相",
+                  "type": "folder",
+                  "title": "蓝橙 诡相",
+                  "children": [
+                    {
+                      "id": "画/原创/流淌着的/蓝橙 诡相/20240118.md",
+                      "type": "note",
+                      "title": "20240118",
+                      "summary": "",
+                      "showTitle": false,
+                      "html": "<p>![20240118.jpg](content/画/原创/流淌着的/蓝橙 诡相/20240118.jpg)</p>\n",
+                      "images": [],
+                      "textContent": "![[20240118.jpg]]"
+                    },
+                    {
+                      "id": "画/原创/流淌着的/蓝橙 诡相/20240210.md",
+                      "type": "note",
+                      "title": "20240210",
+                      "summary": "",
+                      "showTitle": false,
+                      "html": "<p>![20240210.jpg](content/画/原创/流淌着的/蓝橙 诡相/20240210.jpg)</p>\n",
+                      "images": [],
+                      "textContent": "![[20240210.jpg]]"
+                    },
+                    {
+                      "id": "画/原创/流淌着的/蓝橙 诡相/20240827.md",
+                      "type": "note",
+                      "title": "20240827",
+                      "summary": "",
+                      "showTitle": false,
+                      "html": "<p>![20240827.jpg](content/画/原创/流淌着的/蓝橙 诡相/20240827.jpg)</p>\n",
+                      "images": [],
+                      "textContent": "![[20240827.jpg]]"
+                    }
+                  ],
+                  "images": [],
+                  "coverImage": null
+                },
+                {
                   "id": "画/原创/流淌着的/蓝色粉色红色",
                   "type": "folder",
                   "title": "蓝色粉色红色",

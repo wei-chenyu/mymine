@@ -117,12 +117,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "画/稿件/粉蓝色/20242603.md",
+                "file": "画/原创/流淌着的/蓝橙 诡相/20240210.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "20242603"
+              "title": "20240210"
             }
           }
         ],
@@ -158,7 +158,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "20240327a",
+                "query": "20240210",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -199,6 +199,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "画/原创/流淌着的/蓝橙 诡相/20240210.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -208,7 +209,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "反向链接"
+              "title": "20240210 的反向链接列表"
             }
           },
           {
@@ -217,11 +218,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "画/原创/流淌着的/蓝橙 诡相/20240210.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "出链"
+              "title": "20240210 的出链列表"
             }
           },
           {
@@ -259,13 +261,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "画/原创/流淌着的/蓝橙 诡相/20240827.md",
+                "file": "画/原创/流淌着的/蓝橙 诡相/20240210.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "20240827 的大纲"
+              "title": "20240210 的大纲"
             }
           }
         ]
@@ -288,12 +290,13 @@
   },
   "active": "1761d4e076277e54",
   "lastOpenFiles": [
+    "画/原创/流淌着的/蓝橙 诡相/20240118.md",
+    "画/原创/流淌着的/蓝橙 诡相/20240118.jpg",
+    "画/原创/流淌着的/蓝橙 诡相/20240827.md",
+    "画/原创/流淌着的/蓝橙 诡相/20240210.jpg",
     "画/原创/流淌着的/蓝橙 诡相/20240827.jpg",
     "画/原创/流淌着的/蓝橙 诡相/20240210.md",
-    "画/原创/流淌着的/蓝橙 诡相/20240118.jpg",
-    "画/原创/流淌着的/蓝橙 诡相/20240210.jpg",
-    "画/原创/流淌着的/蓝橙 诡相/20240118.md",
-    "画/原创/流淌着的/蓝橙 诡相/20240827.md",
+    "画/原创/流淌着的/蓝橙 诡相",
     "画/原创/编织/光切片/20241113c.md",
     "画/原创/编织/光切片/20241113c.jpg",
     "画/原创/编织/光切片/20240212.jpg",
@@ -331,7 +334,6 @@
     "画/稿件/虹",
     "画/稿件/月棺",
     "画/稿件/瑰梦",
-    "画/原创/流淌着的/紫色",
-    "画/稿件/粉蓝色"
+    "画/原创/流淌着的/紫色"
   ]
 }
