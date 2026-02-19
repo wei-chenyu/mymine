@@ -7,106 +7,80 @@
   },
   "children": [
     {
-      "id": "一级1",
+      "id": "画",
       "type": "folder",
-      "title": "一级1",
+      "title": "画",
       "children": [
         {
-          "id": "一级1/串门.md",
-          "type": "note",
-          "title": "串门",
-          "summary": "",
-          "showTitle": false,
-          "html": "<p><img src=\"content/%E4%B8%80%E7%BA%A73/e.jpg\" alt=\"e.jpg\"></p>\n",
-          "images": [
-            "content/%E4%B8%80%E7%BA%A73/e.jpg"
-          ],
-          "textContent": "![[e.jpg]]"
-        },
-        {
-          "id": "一级1/封面.md",
-          "type": "note",
-          "title": "封面",
-          "summary": "",
-          "showTitle": true,
-          "html": "<p><img src=\"content/%E4%B8%80%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg\" alt=\"白旬.jpg\">\n这是分割\n<a href=\"%EF%BC%9F\">？</a></p>\n",
-          "images": [
-            "content/%E4%B8%80%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg"
-          ],
-          "textContent": "![[白旬.jpg]]\n这是分割\n[[？]]"
-        }
-      ],
-      "images": [
-        "content/%E4%B8%80%E7%BA%A73/e.jpg",
-        "content/%E4%B8%80%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg"
-      ],
-      "coverImage": "content/%E4%B8%80%E7%BA%A71/%E7%99%BD%E6%97%AC.jpg"
-    },
-    {
-      "id": "一级2",
-      "type": "folder",
-      "title": "一级2",
-      "children": [
-        {
-          "id": "一级2/？.md",
-          "type": "note",
-          "title": "？",
-          "summary": "",
-          "showTitle": false,
-          "html": "<p><img src=\"content/%E4%B8%80%E7%BA%A72/%E9%99%B5%E6%B9%8D.png\" alt=\"陵湍.png\"></p>\n",
-          "images": [
-            "content/%E4%B8%80%E7%BA%A72/%E9%99%B5%E6%B9%8D.png"
-          ],
-          "textContent": "![[陵湍.png]]"
-        },
-        {
-          "id": "一级2/二级2",
+          "id": "画/稿件",
           "type": "folder",
-          "title": "二级2",
+          "title": "稿件",
+          "children": [
+            {
+              "id": "画/稿件/20240705.md",
+              "type": "note",
+              "title": "20240705",
+              "summary": "",
+              "showTitle": false,
+              "html": "<p><img src=\"content/%E7%94%BB/%E7%A8%BF%E4%BB%B6/20240705.jpg\" alt=\"20240705.jpg\"></p>\n",
+              "images": [
+                "content/%E7%94%BB/%E7%A8%BF%E4%BB%B6/20240705.jpg"
+              ],
+              "textContent": "![[20240705.jpg]]"
+            },
+            {
+              "id": "画/稿件/20240706.md",
+              "type": "note",
+              "title": "20240706",
+              "summary": "",
+              "showTitle": false,
+              "html": "<p><img src=\"content/%E7%94%BB/%E7%A8%BF%E4%BB%B6/20240706.jpg\" alt=\"20240706.jpg\"></p>\n",
+              "images": [
+                "content/%E7%94%BB/%E7%A8%BF%E4%BB%B6/20240706.jpg"
+              ],
+              "textContent": "![[20240706.jpg]]"
+            }
+          ],
+          "images": [
+            "content/%E7%94%BB/%E7%A8%BF%E4%BB%B6/20240705.jpg",
+            "content/%E7%94%BB/%E7%A8%BF%E4%BB%B6/20240706.jpg"
+          ],
+          "coverImage": null
+        },
+        {
+          "id": "画/流淌着的",
+          "type": "folder",
+          "title": "流淌着的",
+          "children": [],
+          "images": [],
+          "coverImage": null
+        },
+        {
+          "id": "画/同人",
+          "type": "folder",
+          "title": "同人",
+          "children": [],
+          "images": [],
+          "coverImage": null
+        },
+        {
+          "id": "画/未定型的尝试",
+          "type": "folder",
+          "title": "未定型的尝试",
+          "children": [],
+          "images": [],
+          "coverImage": null
+        },
+        {
+          "id": "画/原创",
+          "type": "folder",
+          "title": "原创",
           "children": [],
           "images": [],
           "coverImage": null
         }
       ],
-      "images": [
-        "content/%E4%B8%80%E7%BA%A72/%E9%99%B5%E6%B9%8D.png"
-      ],
-      "coverImage": null
-    },
-    {
-      "id": "一级3",
-      "type": "folder",
-      "title": "一级3",
-      "children": [
-        {
-          "id": "一级3/未命名.md",
-          "type": "note",
-          "title": "未命名",
-          "summary": "",
-          "showTitle": true,
-          "html": "<p><img src=\"content/%E4%B8%80%E7%BA%A73/s.jpg\" alt=\"s.jpg\"></p>\n",
-          "images": [
-            "content/%E4%B8%80%E7%BA%A73/s.jpg"
-          ],
-          "textContent": "![[s.jpg]]"
-        },
-        {
-          "id": "一级3/vc.md",
-          "type": "note",
-          "title": "vc",
-          "summary": "",
-          "showTitle": false,
-          "html": "<p><img src=\"content/%E4%B8%80%E7%BA%A73/e.jpg\" alt=\"e.jpg\"></p>\n",
-          "images": [
-            "content/%E4%B8%80%E7%BA%A73/e.jpg"
-          ],
-          "textContent": "![[e.jpg]]"
-        }
-      ],
-      "images": [
-        "content/%E4%B8%80%E7%BA%A73/s.jpg",
-        "content/%E4%B8%80%E7%BA%A73/e.jpg"
-      ],
+      "images": [],
       "coverImage": null
     }
   ]
