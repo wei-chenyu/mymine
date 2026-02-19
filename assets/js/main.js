@@ -976,9 +976,11 @@ function syncBodyWidthToHero(modalEl) {
     const padL = parseFloat(paneStyle.paddingLeft) || 0;
     const padR = parseFloat(paneStyle.paddingRight) || 0;
     const splitW = split.getBoundingClientRect().width || 0;
-    const minRight = 300;
     const desiredLeft = imgW + padL + padR + 18;
-    const leftTrack = Math.max(420, Math.min(desiredLeft, Math.max(420, splitW - minRight)));
+    const minLeft = Math.max(300, Math.floor(splitW * 0.28));
+    const maxLeft = Math.max(minLeft, Math.floor(splitW * 0.4));
+    const targetLeft = Math.floor(splitW * 0.34);
+    const leftTrack = Math.max(minLeft, Math.min(Math.max(desiredLeft, targetLeft), maxLeft));
     split.style.setProperty("--left-pane-width", `${Math.floor(leftTrack)}px`);
   };
 
