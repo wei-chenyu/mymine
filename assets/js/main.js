@@ -7,7 +7,7 @@ if (avatarEl) {
   avatarEl.onerror = () => { avatarEl.src = "assets/img/avatar-fallback.svg"; };
 }
 
-const HOVER_DELAY = 760; // 悬停多久后才旋转（毫秒）
+const HOVER_DELAY = 300; // 悬停多久后才旋转（毫秒）
 const HOVER_COOLDOWN = 620; // 切换后冷却周期，避免过快连续跳转
 const SWIPE_MIN_DISTANCE = 44;
 let hoverTimer = null;

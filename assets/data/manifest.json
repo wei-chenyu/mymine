@@ -122,86 +122,137 @@
           "title": "同人",
           "children": [
             {
-              "id": "画/同人/02220611.md",
-              "type": "note",
-              "title": "02220611",
-              "summary": "",
-              "showTitle": false,
-              "html": "<p><img src=\"content/%E7%94%BB/%E5%90%8C%E4%BA%BA/02220611.jpg\" alt=\"02220611.jpg\"></p>\n",
-              "images": [
-                "content/%E7%94%BB/%E5%90%8C%E4%BA%BA/02220611.jpg"
+              "id": "画/同人/布袋戏",
+              "type": "folder",
+              "title": "布袋戏",
+              "children": [
+                {
+                  "id": "画/同人/布袋戏/02220611.md",
+                  "type": "note",
+                  "title": "02220611",
+                  "summary": "",
+                  "showTitle": false,
+                  "html": "<p><img src=\"content/%E7%94%BB/%E5%90%8C%E4%BA%BA/%E5%B8%83%E8%A2%8B%E6%88%8F/02220611.jpg\" alt=\"02220611.jpg\"></p>\n",
+                  "images": [
+                    "content/%E7%94%BB/%E5%90%8C%E4%BA%BA/%E5%B8%83%E8%A2%8B%E6%88%8F/02220611.jpg"
+                  ],
+                  "textContent": "![[02220611.jpg]]"
+                },
+                {
+                  "id": "画/同人/布袋戏/20211115.md",
+                  "type": "note",
+                  "title": "20211115",
+                  "summary": "",
+                  "showTitle": false,
+                  "html": "<p><img src=\"content/%E7%94%BB/%E5%90%8C%E4%BA%BA/%E5%B8%83%E8%A2%8B%E6%88%8F/20211115.jpg\" alt=\"20211115.jpg\"></p>\n",
+                  "images": [
+                    "content/%E7%94%BB/%E5%90%8C%E4%BA%BA/%E5%B8%83%E8%A2%8B%E6%88%8F/20211115.jpg"
+                  ],
+                  "textContent": "![[20211115.jpg]]"
+                },
+                {
+                  "id": "画/同人/布袋戏/20221010.md",
+                  "type": "note",
+                  "title": "20221010",
+                  "summary": "",
+                  "showTitle": false,
+                  "html": "<p><img src=\"content/%E7%94%BB/%E5%90%8C%E4%BA%BA/%E5%B8%83%E8%A2%8B%E6%88%8F/20221010.jpg\" alt=\"20221010.jpg\"></p>\n",
+                  "images": [
+                    "content/%E7%94%BB/%E5%90%8C%E4%BA%BA/%E5%B8%83%E8%A2%8B%E6%88%8F/20221010.jpg"
+                  ],
+                  "textContent": "![[20221010.jpg]]"
+                },
+                {
+                  "id": "画/同人/布袋戏/20221014.md",
+                  "type": "note",
+                  "title": "20221014",
+                  "summary": "",
+                  "showTitle": false,
+                  "html": "<p><img src=\"content/%E7%94%BB/%E5%90%8C%E4%BA%BA/%E5%B8%83%E8%A2%8B%E6%88%8F/20221014.jpg\" alt=\"20221014.jpg\"></p>\n",
+                  "images": [
+                    "content/%E7%94%BB/%E5%90%8C%E4%BA%BA/%E5%B8%83%E8%A2%8B%E6%88%8F/20221014.jpg"
+                  ],
+                  "textContent": "![[20221014.jpg]]"
+                },
+                {
+                  "id": "画/同人/布袋戏/20230230.md",
+                  "type": "note",
+                  "title": "20230230",
+                  "summary": "",
+                  "showTitle": false,
+                  "html": "<p><img src=\"content/%E7%94%BB/%E5%90%8C%E4%BA%BA/%E5%B8%83%E8%A2%8B%E6%88%8F/20230230.jpg\" alt=\"20230230.jpg\"></p>\n",
+                  "images": [
+                    "content/%E7%94%BB/%E5%90%8C%E4%BA%BA/%E5%B8%83%E8%A2%8B%E6%88%8F/20230230.jpg"
+                  ],
+                  "textContent": "![[20230230.jpg]]"
+                },
+                {
+                  "id": "画/同人/布袋戏/20250115.md",
+                  "type": "note",
+                  "title": "20250115",
+                  "summary": "",
+                  "showTitle": false,
+                  "html": "<p><img src=\"content/%E7%94%BB/%E5%90%8C%E4%BA%BA/%E5%B8%83%E8%A2%8B%E6%88%8F/20250115.jpg\" alt=\"20250115.jpg\"></p>\n",
+                  "images": [
+                    "content/%E7%94%BB/%E5%90%8C%E4%BA%BA/%E5%B8%83%E8%A2%8B%E6%88%8F/20250115.jpg"
+                  ],
+                  "textContent": "![[20250115.jpg]]"
+                }
               ],
-              "textContent": "![[02220611.jpg]]"
+              "images": [
+                "content/%E7%94%BB/%E5%90%8C%E4%BA%BA/%E5%B8%83%E8%A2%8B%E6%88%8F/02220611.jpg",
+                "content/%E7%94%BB/%E5%90%8C%E4%BA%BA/%E5%B8%83%E8%A2%8B%E6%88%8F/20211115.jpg",
+                "content/%E7%94%BB/%E5%90%8C%E4%BA%BA/%E5%B8%83%E8%A2%8B%E6%88%8F/20221010.jpg",
+                "content/%E7%94%BB/%E5%90%8C%E4%BA%BA/%E5%B8%83%E8%A2%8B%E6%88%8F/20221014.jpg",
+                "content/%E7%94%BB/%E5%90%8C%E4%BA%BA/%E5%B8%83%E8%A2%8B%E6%88%8F/20230230.jpg",
+                "content/%E7%94%BB/%E5%90%8C%E4%BA%BA/%E5%B8%83%E8%A2%8B%E6%88%8F/20250115.jpg"
+              ],
+              "coverImage": null
             },
             {
-              "id": "画/同人/20211115.md",
-              "type": "note",
-              "title": "20211115",
-              "summary": "",
-              "showTitle": false,
-              "html": "<p><img src=\"content/%E7%94%BB/%E5%90%8C%E4%BA%BA/20211115.jpg\" alt=\"20211115.jpg\"></p>\n",
-              "images": [
-                "content/%E7%94%BB/%E5%90%8C%E4%BA%BA/20211115.jpg"
+              "id": "画/同人/亲友",
+              "type": "folder",
+              "title": "亲友",
+              "children": [
+                {
+                  "id": "画/同人/亲友/20241226.md",
+                  "type": "note",
+                  "title": "20241226",
+                  "summary": "",
+                  "showTitle": false,
+                  "html": "<p><img src=\"content/%E7%94%BB/%E5%90%8C%E4%BA%BA/%E4%BA%B2%E5%8F%8B/20241226.jpg\" alt=\"20241226.jpg\"></p>\n",
+                  "images": [
+                    "content/%E7%94%BB/%E5%90%8C%E4%BA%BA/%E4%BA%B2%E5%8F%8B/20241226.jpg"
+                  ],
+                  "textContent": "![[20241226.jpg]]"
+                }
               ],
-              "textContent": "![[20211115.jpg]]"
+              "images": [
+                "content/%E7%94%BB/%E5%90%8C%E4%BA%BA/%E4%BA%B2%E5%8F%8B/20241226.jpg"
+              ],
+              "coverImage": null
             },
             {
-              "id": "画/同人/20230229.md",
-              "type": "note",
-              "title": "20230229",
-              "summary": "",
-              "showTitle": false,
-              "html": "<p><img src=\"content/%E7%94%BB/%E5%90%8C%E4%BA%BA/20230229.jpg\" alt=\"20230229.jpg\"></p>\n",
-              "images": [
-                "content/%E7%94%BB/%E5%90%8C%E4%BA%BA/20230229.jpg"
+              "id": "画/同人/rick and morty",
+              "type": "folder",
+              "title": "rick and morty",
+              "children": [
+                {
+                  "id": "画/同人/rick and morty/20220332.md",
+                  "type": "note",
+                  "title": "20220332",
+                  "summary": "",
+                  "showTitle": false,
+                  "html": "<p>![20220332.jpg](content/画/同人/rick and morty/20220332.jpg)</p>\n",
+                  "images": [],
+                  "textContent": "![[20220332.jpg]]"
+                }
               ],
-              "textContent": "![[20230229.jpg]]"
-            },
-            {
-              "id": "画/同人/20230230.md",
-              "type": "note",
-              "title": "20230230",
-              "summary": "",
-              "showTitle": false,
-              "html": "<p><img src=\"content/%E7%94%BB/%E5%90%8C%E4%BA%BA/20230230.jpg\" alt=\"20230230.jpg\"></p>\n",
-              "images": [
-                "content/%E7%94%BB/%E5%90%8C%E4%BA%BA/20230230.jpg"
-              ],
-              "textContent": "![[20230230.jpg]]"
-            },
-            {
-              "id": "画/同人/20241226.md",
-              "type": "note",
-              "title": "20241226",
-              "summary": "",
-              "showTitle": false,
-              "html": "<p><img src=\"content/%E7%94%BB/%E5%90%8C%E4%BA%BA/20241226.jpg\" alt=\"20241226.jpg\"></p>\n",
-              "images": [
-                "content/%E7%94%BB/%E5%90%8C%E4%BA%BA/20241226.jpg"
-              ],
-              "textContent": "![[20241226.jpg]]"
-            },
-            {
-              "id": "画/同人/20250115.md",
-              "type": "note",
-              "title": "20250115",
-              "summary": "",
-              "showTitle": false,
-              "html": "<p><img src=\"content/%E7%94%BB/%E5%90%8C%E4%BA%BA/20250115.jpg\" alt=\"20250115.jpg\"></p>\n",
-              "images": [
-                "content/%E7%94%BB/%E5%90%8C%E4%BA%BA/20250115.jpg"
-              ],
-              "textContent": "![[20250115.jpg]]"
+              "images": [],
+              "coverImage": null
             }
           ],
-          "images": [
-            "content/%E7%94%BB/%E5%90%8C%E4%BA%BA/02220611.jpg",
-            "content/%E7%94%BB/%E5%90%8C%E4%BA%BA/20211115.jpg",
-            "content/%E7%94%BB/%E5%90%8C%E4%BA%BA/20230229.jpg",
-            "content/%E7%94%BB/%E5%90%8C%E4%BA%BA/20230230.jpg",
-            "content/%E7%94%BB/%E5%90%8C%E4%BA%BA/20241226.jpg",
-            "content/%E7%94%BB/%E5%90%8C%E4%BA%BA/20250115.jpg"
-          ],
+          "images": [],
           "coverImage": null
         },
         {
@@ -215,6 +266,18 @@
               "title": "编织",
               "children": [
                 {
+                  "id": "画/原创/编织/20230132.md",
+                  "type": "note",
+                  "title": "20230132",
+                  "summary": "",
+                  "showTitle": false,
+                  "html": "<p><img src=\"content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E7%BC%96%E7%BB%87/20230132.jpg\" alt=\"20230132.jpg\"></p>\n",
+                  "images": [
+                    "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E7%BC%96%E7%BB%87/20230132.jpg"
+                  ],
+                  "textContent": "![[20230132.jpg]]"
+                },
+                {
                   "id": "画/原创/编织/20230326.md",
                   "type": "note",
                   "title": "20230326",
@@ -225,6 +288,18 @@
                     "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E7%BC%96%E7%BB%87/20230326.jpg"
                   ],
                   "textContent": "![[20230326.jpg]]"
+                },
+                {
+                  "id": "画/原创/编织/20230327.md",
+                  "type": "note",
+                  "title": "20230327",
+                  "summary": "",
+                  "showTitle": false,
+                  "html": "<p><img src=\"content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E7%BC%96%E7%BB%87/20230327.jpg\" alt=\"20230327.jpg\"></p>\n",
+                  "images": [
+                    "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E7%BC%96%E7%BB%87/20230327.jpg"
+                  ],
+                  "textContent": "![[20230327.jpg]]"
                 },
                 {
                   "id": "画/原创/编织/20230328.md",
@@ -239,6 +314,30 @@
                   "textContent": "![[20230328.jpg]]"
                 },
                 {
+                  "id": "画/原创/编织/20231032.md",
+                  "type": "note",
+                  "title": "20231032",
+                  "summary": "",
+                  "showTitle": false,
+                  "html": "<p><img src=\"content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E7%BC%96%E7%BB%87/20231032.jpg\" alt=\"20231032.jpg\"></p>\n",
+                  "images": [
+                    "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E7%BC%96%E7%BB%87/20231032.jpg"
+                  ],
+                  "textContent": "![[20231032.jpg]]"
+                },
+                {
+                  "id": "画/原创/编织/20240107.md",
+                  "type": "note",
+                  "title": "20240107",
+                  "summary": "",
+                  "showTitle": false,
+                  "html": "<p><img src=\"content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E7%BC%96%E7%BB%87/20240107.jpg\" alt=\"20240107.jpg\"></p>\n",
+                  "images": [
+                    "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E7%BC%96%E7%BB%87/20240107.jpg"
+                  ],
+                  "textContent": "![[20240107.jpg]]"
+                },
+                {
                   "id": "画/原创/编织/20240126.md",
                   "type": "note",
                   "title": "20240126",
@@ -249,6 +348,18 @@
                     "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E7%BC%96%E7%BB%87/20240126.jpg"
                   ],
                   "textContent": "![[20240126.jpg]]"
+                },
+                {
+                  "id": "画/原创/编织/20240132.md",
+                  "type": "note",
+                  "title": "20240132",
+                  "summary": "",
+                  "showTitle": false,
+                  "html": "<p><img src=\"content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E7%BC%96%E7%BB%87/20240132.jpg\" alt=\"20240132.jpg\"></p>\n",
+                  "images": [
+                    "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E7%BC%96%E7%BB%87/20240132.jpg"
+                  ],
+                  "textContent": "![[20240132.jpg]]"
                 },
                 {
                   "id": "画/原创/编织/20241129.md",
@@ -264,10 +375,64 @@
                 }
               ],
               "images": [
+                "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E7%BC%96%E7%BB%87/20230132.jpg",
                 "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E7%BC%96%E7%BB%87/20230326.jpg",
+                "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E7%BC%96%E7%BB%87/20230327.jpg",
                 "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E7%BC%96%E7%BB%87/20230328.jpg",
+                "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E7%BC%96%E7%BB%87/20231032.jpg",
+                "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E7%BC%96%E7%BB%87/20240107.jpg",
                 "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E7%BC%96%E7%BB%87/20240126.jpg",
+                "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E7%BC%96%E7%BB%87/20240132.jpg",
                 "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E7%BC%96%E7%BB%87/20241129.jpg"
+              ],
+              "coverImage": null
+            },
+            {
+              "id": "画/原创/幻觉的人格化",
+              "type": "folder",
+              "title": "幻觉的人格化",
+              "children": [
+                {
+                  "id": "画/原创/幻觉的人格化/20220631.md",
+                  "type": "note",
+                  "title": "20220631",
+                  "summary": "",
+                  "showTitle": false,
+                  "html": "<p><img src=\"content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E5%B9%BB%E8%A7%89%E7%9A%84%E4%BA%BA%E6%A0%BC%E5%8C%96/20220631.jpg\" alt=\"20220631.jpg\"></p>\n",
+                  "images": [
+                    "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E5%B9%BB%E8%A7%89%E7%9A%84%E4%BA%BA%E6%A0%BC%E5%8C%96/20220631.jpg"
+                  ],
+                  "textContent": "![[20220631.jpg]]"
+                },
+                {
+                  "id": "画/原创/幻觉的人格化/20230532.md",
+                  "type": "note",
+                  "title": "20230532",
+                  "summary": "",
+                  "showTitle": false,
+                  "html": "<p><img src=\"content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E5%B9%BB%E8%A7%89%E7%9A%84%E4%BA%BA%E6%A0%BC%E5%8C%96/20230532.jpg\" alt=\"20230532.jpg\"></p>\n",
+                  "images": [
+                    "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E5%B9%BB%E8%A7%89%E7%9A%84%E4%BA%BA%E6%A0%BC%E5%8C%96/20230532.jpg"
+                  ],
+                  "textContent": "![[20230532.jpg]]"
+                },
+                {
+                  "id": "画/原创/幻觉的人格化/20230621.md",
+                  "type": "note",
+                  "title": "20230621",
+                  "summary": "",
+                  "showTitle": false,
+                  "html": "<p><img src=\"content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E5%B9%BB%E8%A7%89%E7%9A%84%E4%BA%BA%E6%A0%BC%E5%8C%96/20230621.jpg\" alt=\"20230621.jpg\"></p>\n",
+                  "images": [
+                    "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E5%B9%BB%E8%A7%89%E7%9A%84%E4%BA%BA%E6%A0%BC%E5%8C%96/20230621.jpg"
+                  ],
+                  "textContent": "![[20230621.jpg]]"
+                }
+              ],
+              "images": [
+                "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E5%B9%BB%E8%A7%89%E7%9A%84%E4%BA%BA%E6%A0%BC%E5%8C%96/20220631.jpg",
+                "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E5%B9%BB%E8%A7%89%E7%9A%84%E4%BA%BA%E6%A0%BC%E5%8C%96/20230532.jpg",
+                "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E5%B9%BB%E8%A7%89%E7%9A%84%E4%BA%BA%E6%A0%BC%E5%8C%96/20230621.jpg"
               ],
               "coverImage": null
             },
@@ -287,6 +452,78 @@
                     "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E6%B5%81%E6%B7%8C%E7%9D%80%E7%9A%84/20240118.jpg"
                   ],
                   "textContent": "![[20240118.jpg]]"
+                },
+                {
+                  "id": "画/原创/流淌着的/橙色",
+                  "type": "folder",
+                  "title": "橙色",
+                  "children": [
+                    {
+                      "id": "画/原创/流淌着的/橙色/20220832.md",
+                      "type": "note",
+                      "title": "20220832",
+                      "summary": "",
+                      "showTitle": false,
+                      "html": "<p><img src=\"content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E6%B5%81%E6%B7%8C%E7%9D%80%E7%9A%84/%E6%A9%99%E8%89%B2/20220832.jpg\" alt=\"20220832.jpg\"></p>\n",
+                      "images": [
+                        "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E6%B5%81%E6%B7%8C%E7%9D%80%E7%9A%84/%E6%A9%99%E8%89%B2/20220832.jpg"
+                      ],
+                      "textContent": "![[20220832.jpg]]"
+                    }
+                  ],
+                  "images": [
+                    "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E6%B5%81%E6%B7%8C%E7%9D%80%E7%9A%84/%E6%A9%99%E8%89%B2/20220832.jpg"
+                  ],
+                  "coverImage": null
+                },
+                {
+                  "id": "画/原创/流淌着的/橙色青色",
+                  "type": "folder",
+                  "title": "橙色青色",
+                  "children": [
+                    {
+                      "id": "画/原创/流淌着的/橙色青色/02240118.md",
+                      "type": "note",
+                      "title": "02240118",
+                      "summary": "",
+                      "showTitle": false,
+                      "html": "<p><img src=\"content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E6%B5%81%E6%B7%8C%E7%9D%80%E7%9A%84/%E6%A9%99%E8%89%B2%E9%9D%92%E8%89%B2/02240118.jpg\" alt=\"02240118.jpg\"></p>\n",
+                      "images": [
+                        "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E6%B5%81%E6%B7%8C%E7%9D%80%E7%9A%84/%E6%A9%99%E8%89%B2%E9%9D%92%E8%89%B2/02240118.jpg"
+                      ],
+                      "textContent": "![[02240118.jpg]]"
+                    },
+                    {
+                      "id": "画/原创/流淌着的/橙色青色/20240105.md",
+                      "type": "note",
+                      "title": "20240105",
+                      "summary": "",
+                      "showTitle": false,
+                      "html": "<p><img src=\"content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E6%B5%81%E6%B7%8C%E7%9D%80%E7%9A%84/%E6%A9%99%E8%89%B2%E9%9D%92%E8%89%B2/20240105.jpg\" alt=\"20240105.jpg\"></p>\n",
+                      "images": [
+                        "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E6%B5%81%E6%B7%8C%E7%9D%80%E7%9A%84/%E6%A9%99%E8%89%B2%E9%9D%92%E8%89%B2/20240105.jpg"
+                      ],
+                      "textContent": "![[20240105.jpg]]"
+                    },
+                    {
+                      "id": "画/原创/流淌着的/橙色青色/20240106.md",
+                      "type": "note",
+                      "title": "20240106",
+                      "summary": "",
+                      "showTitle": false,
+                      "html": "<p><img src=\"content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E6%B5%81%E6%B7%8C%E7%9D%80%E7%9A%84/%E6%A9%99%E8%89%B2%E9%9D%92%E8%89%B2/20240106.jpg\" alt=\"20240106.jpg\"></p>\n",
+                      "images": [
+                        "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E6%B5%81%E6%B7%8C%E7%9D%80%E7%9A%84/%E6%A9%99%E8%89%B2%E9%9D%92%E8%89%B2/20240106.jpg"
+                      ],
+                      "textContent": "![[20240106.jpg]]"
+                    }
+                  ],
+                  "images": [
+                    "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E6%B5%81%E6%B7%8C%E7%9D%80%E7%9A%84/%E6%A9%99%E8%89%B2%E9%9D%92%E8%89%B2/02240118.jpg",
+                    "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E6%B5%81%E6%B7%8C%E7%9D%80%E7%9A%84/%E6%A9%99%E8%89%B2%E9%9D%92%E8%89%B2/20240105.jpg",
+                    "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E6%B5%81%E6%B7%8C%E7%9D%80%E7%9A%84/%E6%A9%99%E8%89%B2%E9%9D%92%E8%89%B2/20240106.jpg"
+                  ],
+                  "coverImage": null
                 },
                 {
                   "id": "画/原创/流淌着的/粉色",
@@ -331,6 +568,29 @@
                   ],
                   "images": [
                     "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E6%B5%81%E6%B7%8C%E7%9D%80%E7%9A%84/%E7%B2%89%E8%89%B2%E7%B4%AB%E8%89%B2%E7%BA%A2%E8%89%B2%EF%BC%9F/29249714.jpg"
+                  ],
+                  "coverImage": null
+                },
+                {
+                  "id": "画/原创/流淌着的/蓝红",
+                  "type": "folder",
+                  "title": "蓝红",
+                  "children": [
+                    {
+                      "id": "画/原创/流淌着的/蓝红/20230629.md",
+                      "type": "note",
+                      "title": "20230629",
+                      "summary": "",
+                      "showTitle": false,
+                      "html": "<p><img src=\"content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E6%B5%81%E6%B7%8C%E7%9D%80%E7%9A%84/%E8%93%9D%E7%BA%A2/20230629.jpg\" alt=\"20230629.jpg\"></p>\n",
+                      "images": [
+                        "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E6%B5%81%E6%B7%8C%E7%9D%80%E7%9A%84/%E8%93%9D%E7%BA%A2/20230629.jpg"
+                      ],
+                      "textContent": "![[20230629.jpg]]"
+                    }
+                  ],
+                  "images": [
+                    "content/%E7%94%BB/%E5%8E%9F%E5%88%9B/%E6%B5%81%E6%B7%8C%E7%9D%80%E7%9A%84/%E8%93%9D%E7%BA%A2/20230629.jpg"
                   ],
                   "coverImage": null
                 },
@@ -398,14 +658,6 @@
               "id": "画/原创/未定型的尝试",
               "type": "folder",
               "title": "未定型的尝试",
-              "children": [],
-              "images": [],
-              "coverImage": null
-            },
-            {
-              "id": "画/原创/未命名",
-              "type": "folder",
-              "title": "未命名",
               "children": [],
               "images": [],
               "coverImage": null

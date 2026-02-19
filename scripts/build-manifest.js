@@ -6,6 +6,8 @@ import { marked } from "marked";
 const ROOT = path.resolve("content");
 const PROFILE_MD = path.resolve("profile.md");
 const REPO_ROOT = path.resolve(".");
+const MANIFEST_PATH = path.resolve("assets/data/manifest.json");
+const MANIFEST_META_PATH = path.resolve("assets/data/manifest.meta.json");
 
 const IMAGE_EXT = new Set([".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".bmp"]);
 const VIDEO_EXT = new Set([".mp4", ".webm", ".ogg", ".mov"]);
@@ -17,6 +19,16 @@ async function exists(p) {
     return true;
   } catch {
     return false;
+  }
+}
+
+async function readJsonIfExists(p) {
+  if (!(await exists(p))) return null;
+  try {
+    const raw = await fs.readFile(p, "utf8");
+    return JSON.parse(raw);
+  } catch {
+    return null;
   }
 }
 
@@ -249,6 +261,93 @@ async function walk(dir, contentFileSet, repoFileSet, repoBasenameIndex, base = 
   return children.sort((a, b) => a.title.localeCompare(b.title, "zh-Hans"));
 }
 
+function indexOldNotes(nodes, out = new Map()) {
+  for (const node of nodes || []) {
+    if (node.type === "note" && node.id) out.set(node.id, node);
+    if (node.type === "folder" && node.children) indexOldNotes(node.children, out);
+  }
+  return out;
+}
+
+function sameStat(a, b) {
+  if (!a || !b) return false;
+  return Number(a.size) === Number(b.size) && Number(a.mtimeMs) === Number(b.mtimeMs);
+}
+
+async function walkIncremental(
+  dir,
+  base,
+  oldNoteById,
+  oldMetaNotes,
+  newMetaNotes,
+  getResolverContext,
+  stats
+) {
+  const entries = await fs.readdir(dir, { withFileTypes: true });
+  const children = [];
+
+  for (const e of entries) {
+    if (e.name.startsWith(".")) continue;
+    const full = path.join(dir, e.name);
+    const rel = path.posix.join(base, e.name).replace(/\\/g, "/");
+
+    if (e.isDirectory()) {
+      const folderChildren = await walkIncremental(
+        full,
+        rel,
+        oldNoteById,
+        oldMetaNotes,
+        newMetaNotes,
+        getResolverContext,
+        stats
+      );
+      const { images, coverImage } = collectFolderImages(folderChildren);
+      children.push({
+        id: rel,
+        type: "folder",
+        title: e.name,
+        children: folderChildren,
+        images,
+        coverImage
+      });
+      continue;
+    }
+
+    if (!e.isFile() || !e.name.endsWith(".md")) continue;
+
+    const stat = await fs.stat(full);
+    const fileStat = { size: stat.size, mtimeMs: Math.trunc(stat.mtimeMs) };
+    newMetaNotes[rel] = fileStat;
+
+    const oldNode = oldNoteById.get(rel);
+    const oldStat = oldMetaNotes[rel];
+    const canReuse = oldNode && sameStat(oldStat, fileStat);
+
+    if (canReuse) {
+      children.push(oldNode);
+      stats.reused += 1;
+      continue;
+    }
+
+    const raw = await fs.readFile(full, "utf8");
+    const { contentFileSet, repoFileSet, repoBasenameIndex } = await getResolverContext();
+    const parsed = parseMarkdown(raw, base, contentFileSet, repoFileSet, repoBasenameIndex);
+    children.push({
+      id: rel,
+      type: "note",
+      title: parsed.title || e.name.replace(/\.md$/, ""),
+      summary: parsed.summary || "",
+      showTitle: parsed.showTitle,
+      html: parsed.html,
+      images: parsed.images,
+      textContent: parsed.textContent
+    });
+    stats.parsed += 1;
+  }
+
+  return children.sort((a, b) => a.title.localeCompare(b.title, "zh-Hans"));
+}
+
 async function buildProfile(contentFileSet, repoFileSet, repoBasenameIndex) {
   if (!(await exists(PROFILE_MD))) {
     return {
@@ -266,14 +365,70 @@ async function buildProfile(contentFileSet, repoFileSet, repoBasenameIndex) {
 }
 
 const contentFileSet = await collectContentFiles();
-const { fileSet: repoFileSet, basenameIndex: repoBasenameIndex } = await collectRepoFiles();
+const oldManifest = await readJsonIfExists(MANIFEST_PATH);
+const oldMeta = await readJsonIfExists(MANIFEST_META_PATH);
+const oldMetaNotes = (oldMeta && oldMeta.notes) || {};
+const oldNoteById = indexOldNotes((oldManifest && oldManifest.children) || []);
+const newMetaNotes = {};
+const stats = { reused: 0, parsed: 0 };
+
+let resolverContextPromise = null;
+const getResolverContext = async () => {
+  if (!resolverContextPromise) {
+    resolverContextPromise = (async () => {
+      const { fileSet: repoFileSet, basenameIndex: repoBasenameIndex } = await collectRepoFiles();
+      return { contentFileSet, repoFileSet, repoBasenameIndex };
+    })();
+  }
+  return resolverContextPromise;
+};
+
+let children = [];
+if (await exists(ROOT)) {
+  children = await walkIncremental(
+    ROOT,
+    "",
+    oldNoteById,
+    oldMetaNotes,
+    newMetaNotes,
+    getResolverContext,
+    stats
+  );
+}
+
+const profileStat = (await exists(PROFILE_MD))
+  ? await fs.stat(PROFILE_MD).then(s => ({ size: s.size, mtimeMs: Math.trunc(s.mtimeMs) }))
+  : null;
+const oldProfileStat = oldMeta && oldMeta.profile ? oldMeta.profile : null;
+
+let profile;
+if (oldManifest && oldManifest.profile && sameStat(oldProfileStat, profileStat)) {
+  profile = oldManifest.profile;
+  stats.reused += 1;
+} else {
+  if (profileStat) {
+    const { repoFileSet, repoBasenameIndex } = await getResolverContext();
+    profile = await buildProfile(contentFileSet, repoFileSet, repoBasenameIndex);
+  } else {
+    profile = await buildProfile(contentFileSet, new Set(), new Map());
+  }
+  stats.parsed += 1;
+}
+
 const tree = {
   id: "root",
   title: "content",
-  profile: await buildProfile(contentFileSet, repoFileSet, repoBasenameIndex),
-  children: await walk(ROOT, contentFileSet, repoFileSet, repoBasenameIndex)
+  profile,
+  children
+};
+
+const meta = {
+  version: 1,
+  profile: profileStat,
+  notes: newMetaNotes
 };
 
 await fs.mkdir("assets/data", { recursive: true });
 await fs.writeFile("assets/data/manifest.json", JSON.stringify(tree, null, 2));
-console.log("manifest updated");
+await fs.writeFile("assets/data/manifest.meta.json", JSON.stringify(meta, null, 2));
+console.log(`manifest updated (reused: ${stats.reused}, parsed: ${stats.parsed})`);
