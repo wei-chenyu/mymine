@@ -816,17 +816,32 @@ body.custom-bg {
     width: 100vw;
     height: 100vh;
     padding: 0;
+    overflow: auto;
   }
 
   .modal-split {
-    grid-template-columns: 1fr;
-    grid-template-rows: 1.2fr 0.8fr;
+    display: block;
+    height: auto;
+    min-height: 100%;
     gap: 0;
   }
 
   .modal-left,
   .modal-right {
     padding: 12px;
+    overflow: visible;
+  }
+
+  .modal-hero img {
+    width: 100%;
+    max-width: 100%;
+    max-height: none;
+    height: auto;
+    object-fit: contain;
+  }
+
+  .modal-body {
+    width: 100%;
   }
 
   .modal-grid {
